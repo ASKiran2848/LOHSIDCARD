@@ -2,6 +2,4 @@ flask
 gunicorn
 qrcode
 pillow
-boto3
-python-dotenv
 qrcode[pil] # qrcode with Pillow for image generation
