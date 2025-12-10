@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Details - {{ employee.Name }}</title>
-    <link rel="icon" type="image/png" href="/static/images/company_logo.jpg">
+    <title>Employee List</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,127 +12,70 @@
             padding: 20px;
             color: #333;
         }
-        .container {
-            max-width: 650px;
-            margin: 20px auto;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            border: 1px solid #ddd;
-        }
-        .logo {
-            text-align: center;
+        .employee {
+            border: 1px solid #ccc;
+            padding: 20px;
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .logo img {
-            width: 120px;
-            height: auto;
+        .employee-details {
+            flex: 1;
+        }
+        .employee img {
+            width: 150px;
+            height: 150px;
+            margin-left: 20px;
             border-radius: 8px;
+            border: 1px solid #ddd;
         }
         h1 {
-            color: #0056b3;
             text-align: center;
+            color: #0056b3;
             margin-bottom: 30px;
-            font-size: 2em;
         }
         h2 {
+            margin: 0 0 10px 0;
             color: #007bff;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            margin-top: 35px;
-            font-size: 1.4em;
-            font-weight: 600;
         }
-        p {
-            margin: 10px 0;
-            line-height: 1.8;
-        }
-        .label {
-            font-weight: bold;
-            display: inline-block;
-            width: 160px;
-            color: #555;
-        }
-        .info-value {
-            color: #333;
-        }
-        .emergency-contact-info {
-            background-color: #e7f3ff;
-            border-left: 6px solid #007bff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 25px;
-        }
-        .emergency-contact-info p {
-            margin: 8px 0;
-        }
-        .phone-link {
+        a {
             color: #007bff;
             text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
         }
-        .phone-link:hover {
-            color: #0056b3;
+        a:hover {
             text-decoration: underline;
-        }
-        .qr-code {
-            text-align: center;
-            margin-top: 25px;
-        }
-        .qr-code img {
-            width: 200px;
-            height: 200px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .disclaimer {
-            margin-top: 40px;
-            font-size: 0.9em;
-            color: #777;
-            text-align: center;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Company Logo Section -->
-        <div class="logo">
-            <img src="/static/images/company_logo.jpg" alt="Company Logo" class="logo">
-        </div>
+    <h1>Employee List</h1>
 
-        <h1>Employee Emergency Details</h1>
-
-        <h2>Personal Information</h2>
-        <p><span class="label">Employee ID:</span> <span class="info-value">{{ employee_id }}</span></p>
-        <p><span class="label">Name:</span> <span class="info-value">{{ employee.Name }}</span></p>
-        <p><span class="label">Date of Birth:</span> <span class="info-value">{{ employee['Date of Birth'] }}</span></p>
-        <p><span class="label">Gender:</span> <span class="info-value">{{ employee.Gender }}</span></p>
-
-        <h2>Emergency Contact</h2>
-        <div class="emergency-contact-info">
-            <p><span class="label">Blood Group:</span> <span class="info-value">{{ employee['Emergency Details']['Blood group'] }}</span></p>
-            <p><span class="label">Contact Person:</span> <span class="info-value">{{ employee['Emergency Details']['Contact Person Name'] }}</span></p>
-            <p><span class="label">Relation:</span> <span class="info-value">{{ employee['Emergency Details']['Relation'] }}</span></p>
-            <p><span class="label">Phone Number:</span> 
-               <a href="tel:{{ employee['Emergency Details']['Phone Number'] }}" class="phone-link">{{ employee['Emergency Details']['Phone Number'] }}</a>
-            </p>
-            <p><span class="label">Company Phone:</span> 
-               <a href="tel:{{ employee['Emergency Details']['Company Phone Number'] }}" class="phone-link">{{ employee['Emergency Details']['Company Phone Number'] }}</a>
-            </p>
-        </div>
-
-        <div class="qr-code">
-            <h2>QR Code</h2>
-            <img src="{{ qr_url }}" alt="QR Code for {{ employee.Name }}">
-        </div>
-
-        <p class="disclaimer">
-            This information is for emergency use only. Please handle with care and confidentiality.
-        </p>
-    </div>
+    {% if employees %}
+        {% for emp_id, emp in employees.items() %}
+            <div class="employee">
+                <div class="employee-details">
+                    <h2>{{ emp.details.Name }}</h2>
+                    <p><strong>ID:</strong> {{ emp_id }}</p>
+                    <p><strong>DOB:</strong> {{ emp.details['Date of Birth'] }}</p>
+                    <p><strong>Gender:</strong> {{ emp.details.Gender }}</p>
+                    <p><strong>Blood Group:</strong> {{ emp.details['Emergency Details']['Blood group'] }}</p>
+                    <p><strong>Contact:</strong> {{ emp.details['Emergency Details']['Contact Person Name'] }} ({{ emp.details['Emergency Details']['Relation'] }})</p>
+                    <p><strong>Phone:</strong> {{ emp.details['Emergency Details']['Phone Number'] }}</p>
+                    <p><strong>Company Phone:</strong> {{ emp.details['Emergency Details']['Company Phone Number'] }}</p>
+                    <p><a href="{{ url_for('emergency_details_page', employee_id=emp_id) }}">View Details Page</a></p>
+                </div>
+                <img src="{{ emp.qr_url }}" alt="QR Code for {{ emp.details.Name }}">
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No employees found. Add employees using the form.</p>
+    {% endif %}
 </body>
 </html>
+
+
+
+
