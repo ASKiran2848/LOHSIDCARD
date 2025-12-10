@@ -1,66 +1,77 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency System Home</title>
-    <link rel="icon" type="image/png" href="/static/images/company_logo.jpg">
+    <title>Employee List</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #eef2f7;
             margin: 0;
             padding: 20px;
-            color: #343a40;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            color: #333;
         }
-        .container {
-            max-width: 600px;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-            border: 1px solid #e0e0e0;
-            text-align: center;
+        .employee {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .employee-details {
+            flex: 1;
+        }
+        .employee img {
+            width: 150px;
+            height: 150px;
+            margin-left: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
         }
         h1 {
-            color: #007bff;
-            font-size: 2.5em;
-            margin-bottom: 25px;
-        }
-        p {
-            font-size: 1.1em;
-            line-height: 1.6;
+            text-align: center;
+            color: #0056b3;
             margin-bottom: 30px;
         }
-        .button-link {
-            display: inline-block;
-            padding: 15px 30px;
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 1.2em;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.1s ease;
+        h2 {
+            margin: 0 0 10px 0;
+            color: #007bff;
         }
-        .button-link:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to the Employee Emergency Details System!</h1>
-        <p>This system allows you to manage and quickly access employee emergency contact information via QR codes.</p>
-        <a href="{{ url_for('add_employee') }}" class="button-link">Add New Employee</a>
-        <br><br>
-        <p><small>Scan an employee QR code to view details.</small></p>
-    </div>
+    <h1>Employee List</h1>
+
+    {% if employees %}
+        {% for emp_id, emp in employees.items() %}
+            <div class="employee">
+                <div class="employee-details">
+                    <h2>{{ emp.details.Name }}</h2>
+                    <p><strong>ID:</strong> {{ emp_id }}</p>
+                    <p><strong>DOB:</strong> {{ emp.details['Date of Birth'] }}</p>
+                    <p><strong>Gender:</strong> {{ emp.details.Gender }}</p>
+                    <p><strong>Blood Group:</strong> {{ emp.details['Emergency Details']['Blood group'] }}</p>
+                    <p><strong>Contact:</strong> {{ emp.details['Emergency Details']['Contact Person Name'] }} ({{ emp.details['Emergency Details']['Relation'] }})</p>
+                    <p><strong>Phone:</strong> {{ emp.details['Emergency Details']['Phone Number'] }}</p>
+                    <p><strong>Company Phone:</strong> {{ emp.details['Emergency Details']['Company Phone Number'] }}</p>
+                    <p><a href="{{ url_for('emergency_details_page', employee_id=emp_id) }}">View Details Page</a></p>
+                </div>
+                <img src="{{ emp.qr_url }}" alt="QR Code for {{ emp.details.Name }}">
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No employees found. Add employees using the form.</p>
+    {% endif %}
 </body>
 </html>

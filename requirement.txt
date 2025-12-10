@@ -1,3 +1,0 @@
-Flask
-gunicorn
-qrcode[pil] # qrcode with Pillow for image generation

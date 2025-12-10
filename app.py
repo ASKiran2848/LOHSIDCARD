@@ -1,110 +1,103 @@
-# app.py
-from flask import Flask, render_template, abort, request, redirect, url_for, jsonify
+from flask import Flask, render_template, abort, request, url_for
 import json
-import random
-import string
-import os # Import os for file path checks
+import os
+from generate_qrcodes import generate_employee_qr_code, load_employee_data
 
 app = Flask(__name__)
 
 # --- Configuration ---
-BASE_URL = "http://192.168.0.139:5000" # IMPORTANT: Adjust this for your deployment!
-DATA_FILE = 'data.json' # Define the JSON file for data storage
+BASE_URL = "http://YOUR_SERVER_IP:5000"  # Change to your server IP or domain
+DATA_FILE = 'data.json'
+QR_CODES_DIR = os.path.join("static", "employee_qrcodes")
 
-# Global variable to hold employee data (loaded from JSON)
+# Global variable to hold employee data
 employee_data_db = {}
 
-# Helper function to load data from JSON file
-def load_employee_data():
+# --- Load employee data ---
+def load_data():
     global employee_data_db
-    if os.path.exists(DATA_FILE) and os.path.getsize(DATA_FILE) > 0:
-        try:
-            with open(DATA_FILE, 'r') as f:
-                employee_data_db = json.load(f)
-            print(f"Loaded {len(employee_data_db)} employees from {DATA_FILE}")
-        except json.JSONDecodeError:
-            print(f"Error decoding JSON from {DATA_FILE}. Starting with empty data.")
-            employee_data_db = {}
-    else:
-        print(f"Data file '{DATA_FILE}' not found or is empty. Starting with empty data.")
-        employee_data_db = {}
+    employee_data_db = load_employee_data()
 
-# Helper function to save data to JSON file
-def save_employee_data():
+# --- Save employee data ---
+def save_data():
     with open(DATA_FILE, 'w') as f:
         json.dump(employee_data_db, f, indent=4)
     print(f"Saved {len(employee_data_db)} employees to {DATA_FILE}")
 
-# Initialize data on app startup
-load_employee_data()
+# --- Generate QR codes for all employees ---
+def generate_all_qrcodes():
+    if not employee_data_db:
+        print("No employees to generate QR codes for.")
+        return
 
-# Removed the generate_unique_employee_id function as it's no longer needed for new employee creation
+    os.makedirs(QR_CODES_DIR, exist_ok=True)
 
+    for emp_id, details in employee_data_db.items():
+        qr_path = os.path.join(QR_CODES_DIR, f"qr_code_{emp_id}.png")
+        if not os.path.exists(qr_path):
+            generate_employee_qr_code(emp_id, details)
+        else:
+            print(f"QR code already exists for {emp_id}")
+
+# --- Initialize ---
+load_data()
+generate_all_qrcodes()
+
+# --- Routes ---
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Prepare QR URLs for each employee
+    employees = {}
+    for emp_id, details in employee_data_db.items():
+        qr_filename = f"qr_code_{emp_id}.png"
+        qr_path = os.path.join(QR_CODES_DIR, qr_filename)
+        qr_url = f"/static/employee_qrcodes/{qr_filename}" if os.path.exists(qr_path) else "/static/images/placeholder_qr.png"
+        employees[emp_id] = {"details": details, "qr_url": qr_url}
+
+    return render_template('index.html', employees=employees)
 
 @app.route('/emergency_details/<employee_id>')
 def emergency_details_page(employee_id):
-    """
-    Renders the emergency details page for a specific employee ID.
-    """
     employee = employee_data_db.get(employee_id)
-
     if not employee:
-        abort(404, description=f"Employee details for ID '{employee_id}' not found.")
+        abort(404, description=f"Employee ID '{employee_id}' not found.")
 
-    return render_template('emergency_details.html', employee=employee, employee_id=employee_id)
+    qr_filename = f"qr_code_{employee_id}.png"
+    qr_path = os.path.join(QR_CODES_DIR, qr_filename)
+    qr_url = f"/static/employee_qrcodes/{qr_filename}" if os.path.exists(qr_path) else "/static/images/placeholder_qr.png"
+
+    return render_template('emergency_details.html', employee=employee, employee_id=employee_id, qr_url=qr_url)
 
 @app.route('/add_employee', methods=['GET', 'POST'])
 def add_employee():
     if request.method == 'POST':
-        # Get the employee_id directly from the form input
-        new_employee_id = request.form['employee_id'].strip() # Use .strip() to remove leading/trailing whitespace
-
-        # Basic validation: Check if employee_id is provided and if it already exists
+        new_employee_id = request.form['employee_id'].strip()
         if not new_employee_id:
-            return render_template('add_employee_form.html', 
-                                   message="Error: Employee ID cannot be empty.", 
-                                   message_type="error") # Add a message_type to style errors differently if you wish
+            return render_template('add_employee_form.html', message="Employee ID cannot be empty.", message_type="error")
         if new_employee_id in employee_data_db:
-            return render_template('add_employee_form.html', 
-                                   message=f"Error: Employee ID '{new_employee_id}' already exists. Please use a unique ID.", 
-                                   message_type="error")
-
-        employee_name = request.form['name']
-        dob = request.form['dob']
-        gender = request.form['gender']
-        blood_group = request.form['blood_group']
-        contact_person_name = request.form['contact_person_name']
-        relation = request.form['relation']
-        phone_number = request.form['phone_number']
-        company_phone_number = request.form['company_phone_number']
+            return render_template('add_employee_form.html', message=f"Employee ID '{new_employee_id}' already exists.", message_type="error")
 
         new_employee_data = {
-            "Name": employee_name,
-            "Date of Birth": dob,
-            "Gender": gender,
+            "Name": request.form['name'],
+            "Date of Birth": request.form['dob'],
+            "Gender": request.form['gender'],
             "Emergency Details": {
-                "Blood group": blood_group,
-                "Contact Person Name": contact_person_name,
-                "Relation": relation,
-                "Phone Number": phone_number,
-                "Company Phone Number": company_phone_number
+                "Blood group": request.form['blood_group'],
+                "Contact Person Name": request.form['contact_person_name'],
+                "Relation": request.form['relation'],
+                "Phone Number": request.form['phone_number'],
+                "Company Phone Number": request.form['company_phone_number']
             }
         }
 
-        # Add to the global dictionary using the user-provided ID
         employee_data_db[new_employee_id] = new_employee_data
-        # Save the updated dictionary to the JSON file
-        save_employee_data()
+        save_data()
 
-        json_output = json.dumps({new_employee_id: new_employee_data}, indent=4)
-        print(f"NEW EMPLOYEE DATA ADDED & SAVED:\n{json_output}")
+        # Generate QR code for the new employee immediately
+        generate_employee_qr_code(new_employee_id, new_employee_data)
 
         return render_template('add_employee_form.html',
-                               message=f"Employee '{employee_name}' added successfully! ID: {new_employee_id}",
-                               json_output=json_output,
+                               message=f"Employee '{new_employee_data['Name']}' added successfully! ID: {new_employee_id}",
                                new_employee_id=new_employee_id)
 
     return render_template('add_employee_form.html')
