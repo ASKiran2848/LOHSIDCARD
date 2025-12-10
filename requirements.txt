@@ -1,0 +1,5 @@
+flask
+gunicorn
+qrcode
+pillow
+qrcode[pil] # qrcode with Pillow for image generation
