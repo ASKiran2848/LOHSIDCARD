@@ -1,0 +1,121 @@
+<!-- templates/emergency_details.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Details - {{ employee.Name }}</title>
+    <link rel="icon" type="image/png" href="/static/images/company_logo.jpg">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 650px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 120px; /* adjust as needed */
+            height: auto;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 35px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        p {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 160px;
+            color: #555;
+        }
+        .info-value {
+            color: #333;
+        }
+        .emergency-contact-info {
+            background-color: #e7f3ff;
+            border-left: 6px solid #007bff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+        .emergency-contact-info p {
+            margin: 8px 0;
+        }
+        .phone-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .phone-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .disclaimer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Company Logo Section -->
+        <div class="logo">
+            <img src="/static/images/company_logo.jpg" alt="Company Logo" class="logo">
+        </div>
+
+        <h1>Employee Emergency Details</h1>
+
+        <h2>Personal Information</h2>
+        <p><span class="label">Employee ID:</span> <span class="info-value">{{ employee_id }}</span></p>
+        <p><span class="label">Name:</span> <span class="info-value">{{ employee.Name }}</span></p>
+        <p><span class="label">Date of Birth:</span> <span class="info-value">{{ employee['Date of Birth'] }}</span></p>
+        <p><span class="label">Gender:</span> <span class="info-value">{{ employee.Gender }}</span></p>
+
+        <h2>Emergency Contact</h2>
+        <div class="emergency-contact-info">
+            <p><span class="label">Blood Group:</span> <span class="info-value">{{ employee['Emergency Details']['Blood group'] }}</span></p>
+            <p><span class="label">Contact Person:</span> <span class="info-value">{{ employee['Emergency Details']['Contact Person Name'] }}</span></p>
+            <p><span class="label">Relation:</span> <span class="info-value">{{ employee['Emergency Details']['Relation'] }}</span></p>
+            <p><span class="label">Phone Number:</span> <a href="tel:{{ employee['Emergency Details']['Phone Number'] }}" class="phone-link">{{ employee['Emergency Details']['Phone Number'] }}</a></p>
+            <p><span class="label">Company Phone:</span> <a href="tel:{{ employee['Emergency Details']['Company Phone Number'] }}" class="phone-link">{{ employee['Emergency Details']['Company Phone Number'] }}</a></p>
+        </div>
+
+        <p class="disclaimer">
+            This information is for emergency use only. Please handle with care and confidentiality.
+        </p>
+    </div>
+</body>
+</html>

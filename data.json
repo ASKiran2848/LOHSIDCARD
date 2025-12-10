@@ -1,0 +1,62 @@
+{
+    "FLH801IT": {
+        "Name": "N Nookambika",
+        "Date of Birth": "25/07/2000",
+        "Gender": "Female",
+        "Emergency Details": {
+            "Blood group": "A+",
+            "Contact Person Name": "Test Name",
+            "Relation": "Father",
+            "Phone Number": "+91 98765 43210",
+            "Company Phone Number": "+91 12345 6789"
+        }
+    },
+    "FLH802IT": {
+        "Name": "Bali Lokesh",
+        "Date of Birth": "25/07/2000",
+        "Gender": "Male",
+        "Emergency Details": {
+            "Blood group": "A+",
+            "Contact Person Name": "Test Name",
+            "Relation": "Father",
+            "Phone Number": "+91 98765 43210",
+            "Company Phone Number": "+91 12345 6789"
+        }
+    },
+    "FLH803IT": {
+        "Name": "N RAMYA",
+        "Date of Birth": "08/08/2002",
+        "Gender": "Female",
+        "Emergency Details": {
+            "Blood group": "O-",
+            "Contact Person Name": "test",
+            "Relation": "Mother",
+            "Phone Number": "+91 91234 56789",
+            "Company Phone Number": "+91 12345 6789"
+        }
+    },
+    "FLH804IT": {
+        "Name": "Sravan Kumar",
+        "Date of Birth": "08/08/2002",
+        "Gender": "Male",
+        "Emergency Details": {
+            "Blood group": "O-",
+            "Contact Person Name": "Suneetha",
+            "Relation": "Mother",
+            "Phone Number": "+91 91234 56789",
+            "Company Phone Number": "+91 12345 6789"
+        }
+    },
+    "SVJ": {
+        "Name": "DWJBJ",
+        "Date of Birth": "BDJFSJ",
+        "Gender": "Female",
+        "Emergency Details": {
+            "Blood group": "JNFEJ",
+            "Contact Person Name": "JBENMF",
+            "Relation": "JFEJQ",
+            "Phone Number": "BDJJ",
+            "Company Phone Number": "BBJ"
+        }
+    }
+}
