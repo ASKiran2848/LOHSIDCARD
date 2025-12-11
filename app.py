@@ -1,29 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for
-import json, os
+import json
 from PIL import Image
 import qrcode
 import io
 import base64
+import os
 
 app = Flask(__name__)
 
-DATA_FILE = "employees.json"
+# In-memory storage for employees
+employees = {}
 
-# Load employees from JSON if exists
-if os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "r") as f:
-        employees = json.load(f)
-else:
-    employees = {}
-
-# Save employees to JSON
-def save_employees():
-    with open(DATA_FILE, "w") as f:
-        json.dump(employees, f, indent=4)
-
-# Generate QR code with logo in center
-def generate_qr_code(employee_id, name, logo_path="static/images/company_logo.jpg"):
-    data = f"http://127.0.0.1:5000/employee/{employee_id}"
+# -------------------- QR Code Generation --------------------
+def generate_qr_code(data, logo_path="static/images/company_logo.jpg"):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -34,28 +23,33 @@ def generate_qr_code(employee_id, name, logo_path="static/images/company_logo.jp
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
 
+    # Add logo if exists
     if logo_path and os.path.exists(logo_path):
         logo = Image.open(logo_path)
         qr_width, qr_height = qr_img.size
         logo_size = qr_width // 4
         logo = logo.resize((logo_size, logo_size), Image.Resampling.LANCZOS)
         pos = ((qr_width - logo_size) // 2, (qr_height - logo_size) // 2)
+
         if logo.mode in ('RGBA', 'LA'):
             qr_img.paste(logo, pos, mask=logo)
         else:
             qr_img.paste(logo, pos)
 
+    # Convert to base64
     buffered = io.BytesIO()
     qr_img.save(buffered, format="PNG")
-    qr_b64 = base64.b64encode(buffered.getvalue()).decode()
+    qr_b64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
     return f"data:image/png;base64,{qr_b64}"
 
-# ---------------- ROUTES ----------------
+# -------------------- ROUTES --------------------
 
+# Home / Employee List
 @app.route('/')
 def index():
     return render_template("index.html", employees=employees)
 
+# Add Employee Page
 @app.route('/add', methods=['GET', 'POST'])
 def add_employee_page():
     message = None
@@ -90,14 +84,14 @@ def add_employee_page():
                 }
             }
 
-            qr_url = generate_qr_code(employee_id, name)
+            # Generate URL for QR code
+            full_url = request.host_url.rstrip('/') + url_for('emergency_details_page', employee_id=employee_id)
+            qr_url = generate_qr_code(full_url)
 
             employees[employee_id] = {
                 "details": employee_data,
                 "qr_url": qr_url
             }
-
-            save_employees()
 
             message = f"Employee {name} added successfully!"
             new_employee_id = employee_id
@@ -110,23 +104,26 @@ def add_employee_page():
         json_output=json_output
     )
 
+# Edit Employee Search
 @app.route('/edit_employee_search', methods=['GET', 'POST'])
 def edit_employee_search():
-    error_message = None
+    message = None
     if request.method == 'POST':
-        employee_id = request.form.get('employee_id', "").strip()
-        if employee_id == "":
-            error_message = "Please enter a valid Employee ID."
+        employee_id = request.form.get('employee_id', '').strip()
+        if not employee_id:
+            message = "Please enter a valid Employee ID."
         elif employee_id not in employees:
-            error_message = f"Employee ID {employee_id} not found."
+            message = f"Employee ID {employee_id} not found."
         else:
             return redirect(url_for('emergency_details_page', employee_id=employee_id))
-    return render_template("edit_employee_search.html", error_message=error_message)
+    return render_template("edit_employee_search.html", message=message)
 
+# Emergency Details Page
 @app.route('/employee/<employee_id>')
 def emergency_details_page(employee_id):
     if employee_id not in employees:
         return f"Employee ID {employee_id} not found.", 404
+
     emp = employees[employee_id]
     return render_template(
         "emergency_details.html",
@@ -135,6 +132,6 @@ def emergency_details_page(employee_id):
         qr_url=emp["qr_url"]
     )
 
-# ------------- MAIN ----------------
+# -------------------- RUN --------------------
 if __name__ == "__main__":
-    app.run(debug=False, host="0.0.0.0", port=5000)
+    app.run(debug=True)
