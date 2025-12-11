@@ -1,187 +1,55 @@
-<!-- templates/add_employee_form.html -->
-{% include 'navbar.html' %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Employee</title>
-    <link rel="icon" type="image/png" href="/static/images/company_logo.jpg">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 20px;
-            color: #343a40;
-        }
-        .container {
-            max-width: 700px;
-            margin: 20px auto;
-            background-color: #ffffff;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-            border: 1px solid #e0e0e0;
-        }
-        h1 {
-            color: #007bff;
-            text-align: center;
-            margin-bottom: 35px;
-            font-size: 2.2em;
-        }
-        form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 30px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #555;
-            font-size: 0.95em;
-        }
-        input[type="text"],
-        input[type="date"],
-        input[type="tel"],
-        select {
-            padding: 12px 15px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 1em;
-            width: 100%;
-            box-sizing: border-box; /* Include padding in width */
-            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            background-color: #fcfcfc;
-        }
-        input:focus, select:focus {
-            border-color: #80bdff;
-            outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-            background-color: #fff;
-        }
-        .full-width {
-            grid-column: 1 / -1; /* Spans across both columns */
-        }
-        button {
-            grid-column: 1 / -1;
-            padding: 15px 25px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
-        button:active {
-            transform: translateY(0);
-        }
-        .message {
-            grid-column: 1 / -1;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        pre {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-size: 0.9em;
-            color: #333;
-            grid-column: 1 / -1;
-            margin-top: 20px;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Add New Employee Emergency Details</h1>
+{% extends "base.html" %}
+{% block title %}Add Employee{% endblock %}
 
-        {% if message %}
-            <div class="message success">
-                {{ message }}
-                {% if new_employee_id %}
-                    <br>You can view details: <a href="{{ url_for('emergency_details_page', employee_id=new_employee_id) }}">View Details for {{ new_employee_id }}</a>
-                {% endif %}
-            </div>
-        {% endif %}
+{% block content %}
+<h2>Add New Employee</h2>
 
-        <form method="POST">
-            <div class="form-group">
-                <label for="employee_id">Employee ID:</label>
-                <input type="text" id="employee_id" name="employee_id" required>
-            </div>
-            <div class="form-group">
-                <label for="name">Employee Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="dob">Date of Birth (DD/MM/YYYY):</label>
-                <input type="text" id="dob" name="dob" placeholder="e.g., 08/08/2002" required>
-            </div>
-            <div class="form-group">
-                <label for="gender">Gender:</label>
-                <select id="gender" name="gender" required>
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="blood_group">Blood Group:</label>
-                <input type="text" id="blood_group" name="blood_group" placeholder="e.g., O-, A+" required>
-            </div>
-            <div class="form-group">
-                <label for="contact_person_name">Emergency Contact Person Name:</label>
-                <input type="text" id="contact_person_name" name="contact_person_name" required>
-            </div>
-            <div class="form-group">
-                <label for="relation">Relation to Employee:</label>
-                <input type="text" id="relation" name="relation" placeholder="e.g., Mother, Spouse" required>
-            </div>
-            <div class="form-group">
-                <label for="phone_number">Emergency Contact Phone Number:</label>
-                <input type="tel" id="phone_number" name="phone_number" placeholder="e.g., +91 91234 56789" required>
-            </div>
-            <div class="form-group">
-                <label for="company_phone_number">Company Phone Number:</label>
-                <input type="tel" id="company_phone_number" name="company_phone_number" placeholder="e.g., +91 12345 6789" required>
-            </div>
-            
-            <button type="submit">Add Employee</button>
-        </form>
+{% if message %}
+<div class="msg success">{{ message }}</div>
+{% endif %}
 
-        {% if json_output %}
-            <h2>Generated JSON Data:</h2>
-            <pre><code>{{ json_output }}</code></pre>
-        {% endif %}
-    </div>
-</body>
-</html>
+<form method="POST">
+    <label>Employee ID</label>
+    <input type="text" name="employee_id" required>
+
+    <label>Name</label>
+    <input type="text" name="name" required>
+
+    <label>Date of Birth</label>
+    <input type="date" name="dob" required>
+
+    <label>Gender</label>
+    <select name="gender" required>
+        <option>Male</option><option>Female</option><option>Other</option>
+    </select>
+
+    <h3>Emergency Details</h3>
+    <label>Blood Group</label>
+    <input type="text" name="blood_group" required>
+
+    <label>Contact Person Name</label>
+    <input type="text" name="contact_person_name" required>
+
+    <label>Relation</label>
+    <input type="text" name="relation" required>
+
+    <label>Contact Person Phone</label>
+    <input type="text" name="phone_number" required>
+
+    <label>Company Phone Number</label>
+    <input type="text" name="company_phone_number" required>
+
+    <button type="submit">Add Employee</button>
+</form>
+
+{% if new_employee_id %}
+<hr>
+<h3>Generated QR Code:</h3>
+<img class="qr" src="{{ employees[new_employee_id].qr_base64 }}">
+<br><br>
+<a class="btn" href="{{ employees[new_employee_id].qr_url }}" target="_blank">Download QR from Cloudinary</a>
+
+<h3>Employee JSON</h3>
+<pre>{{ json_output }}</pre>
+{% endif %}
+{% endblock %}

@@ -5,23 +5,24 @@ import qrcode
 import io
 import base64
 import os
+import cloudinary
+import cloudinary.uploader
 
 app = Flask(__name__)
+
+# ---------------- Cloudinary Configuration ----------------
+cloudinary.config(
+    cloud_name="dr6bskpxy",
+    api_key="854213433653329",
+    api_secret="x7Ak24biA-hPhm66C3tYBrlW_4Y"
+)
 
 # In-memory storage for employees
 employees = {}
 
-
-# ---------- QR Code Function ----------
+# ---------------- QR Code Function ----------------
 def generate_qr_code(employee_id, name, logo_path="static/images/company_logo.jpg"):
-    """
-    Generates a QR code that points to the employee view page.
-    Includes optional logo in center.
-    Returns base64 PNG.
-    """
-    # Full URL for redirection
     data = f"{request.host_url}employee/{employee_id}"
-
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -44,23 +45,33 @@ def generate_qr_code(employee_id, name, logo_path="static/images/company_logo.jp
         else:
             qr_img.paste(logo, pos)
 
+    # Save to in-memory file
     buffered = io.BytesIO()
     qr_img.save(buffered, format="PNG")
+    buffered.seek(0)
+
+    # Convert to base64
     qr_b64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-    return f"data:image/png;base64,{qr_b64}"
+    qr_b64_str = f"data:image/png;base64,{qr_b64}"
 
+    # Upload to Cloudinary
+    buffered.seek(0)
+    upload_result = cloudinary.uploader.upload(
+        buffered,
+        folder="employee_qrcodes",
+        public_id=employee_id,
+        overwrite=True,
+        resource_type="image"
+    )
+    cloudinary_url = upload_result.get("secure_url")
+    return cloudinary_url, qr_b64_str
 
-# ============================================================
-# ROUTES
-# ============================================================
+# ===================== ROUTES =====================
 
-# ---------- Home Page ----------
 @app.route('/')
 def index():
     return render_template("index.html", employees=employees)
 
-
-# ---------- Add Employee ----------
 @app.route('/add', methods=['GET', 'POST'])
 def add_employee_page():
     message = None
@@ -78,7 +89,6 @@ def add_employee_page():
         phone_number = request.form['phone_number']
         company_phone_number = request.form['company_phone_number']
 
-        # Check duplicate
         if employee_id in employees:
             message = f"Employee ID {employee_id} already exists!"
         else:
@@ -95,16 +105,12 @@ def add_employee_page():
                     "Company Phone Number": company_phone_number
                 }
             }
-
-            # Generate QR code with logo
-            qr_url = generate_qr_code(employee_id, name)
-
-            # Save in memory
+            cloud_url, qr_b64 = generate_qr_code(employee_id, name)
             employees[employee_id] = {
                 "details": employee_data,
-                "qr_url": qr_url
+                "qr_url": cloud_url,
+                "qr_base64": qr_b64
             }
-
             message = f"Employee {name} added successfully!"
             new_employee_id = employee_id
             json_output = json.dumps(employee_data, indent=4)
@@ -113,11 +119,10 @@ def add_employee_page():
         "add_employee_form.html",
         message=message,
         new_employee_id=new_employee_id,
-        json_output=json_output
+        json_output=json_output,
+        employees=employees
     )
 
-
-# ---------- Edit Employee ----------
 @app.route('/edit/<employee_id>', methods=['GET', 'POST'])
 def edit_employee(employee_id):
     if employee_id not in employees:
@@ -127,7 +132,6 @@ def edit_employee(employee_id):
     message = None
 
     if request.method == 'POST':
-        # Update details
         name = request.form['name']
         dob = request.form['dob']
         gender = request.form['gender']
@@ -150,55 +154,53 @@ def edit_employee(employee_id):
             }
         })
 
-        # Regenerate QR in case name changed
-        emp["qr_url"] = generate_qr_code(employee_id, name)
+        cloud_url, qr_b64 = generate_qr_code(employee_id, name)
+        emp["qr_url"] = cloud_url
+        emp["qr_base64"] = qr_b64
         message = "Employee details updated successfully!"
 
-    return render_template("edit_employee.html", employee_id=employee_id, employee=emp["details"], message=message)
+    return render_template(
+        "edit_employee.html",
+        employee_id=employee_id,
+        employee=emp["details"],
+        message=message,
+        employees=employees
+    )
 
-
-# ---------- Delete Employee ----------
 @app.route('/delete/<employee_id>', methods=['POST'])
 def delete_employee(employee_id):
     if employee_id in employees:
         del employees[employee_id]
     return redirect(url_for('index'))
 
-
-# ---------- Emergency Details Page ----------
 @app.route('/employee/<employee_id>')
 def emergency_details_page(employee_id):
     if employee_id not in employees:
         return f"Employee ID {employee_id} not found.", 404
-
     emp = employees[employee_id]
-
     return render_template(
         "emergency_details.html",
         employee_id=employee_id,
         employee=emp["details"],
-        qr_url=emp["qr_url"]
+        qr_url=emp["qr_url"],
+        qr_base64=emp["qr_base64"]
     )
 
-
-# ---------- Search Page ----------
 @app.route('/edit_employee_search', methods=['GET', 'POST'])
 def edit_employee_search():
     error_message = None
-
     if request.method == 'POST':
         employee_id = request.form.get('employee_id', "").strip()
-
         if employee_id == "":
             error_message = "Please enter a valid Employee ID."
         elif employee_id not in employees:
             error_message = f"Employee ID {employee_id} not found."
         else:
             return redirect(url_for('edit_employee', employee_id=employee_id))
+    return render_template(
+        "edit_employee_search.html",
+        error_message=error_message
+    )
 
-    return render_template("edit_employee_search.html", error_message=error_message)
-
-
-# ---------- Main ----------
 if __name__ == "__main__":
     app.run(debug=True)

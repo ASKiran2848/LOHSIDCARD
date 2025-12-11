@@ -1,11 +1,24 @@
-{% include 'navbar.html' %}
-<div style="padding: 20px; max-width: 600px; margin: auto;">
-    <h2>Search Employee</h2>
-    {% if error_message %}
-        <p style="color: red; font-weight: bold;">{{ error_message }}</p>
-    {% endif %}
-    <form method="POST" style="display: flex; flex-direction: column; gap: 15px;">
-        <input type="text" name="employee_id" placeholder="Enter Employee ID" required>
-        <button type="submit" style="padding: 12px; background-color: #1a1a2e; color: white; border: none; border-radius: 6px;">Search</button>
+{% extends "base.html" %}
+{% block title %}Search Employee{% endblock %}
+
+{% block content %}
+<div style="max-width:500px; margin:40px auto; padding:20px; background:#f9f9f9; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center; margin-bottom:20px;">Search Employee to Edit</h2>
+
+    <form method="POST">
+        <input type="text" name="employee_id" placeholder="Enter Employee ID" 
+               style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; font-size:16px;">
+        
+        <button type="submit" 
+                style="width:100%; margin-top:15px; padding:12px; background:#007bff; color:white; border:none; border-radius:6px; font-size:16px; cursor:pointer; transition:0.3s;">
+            🔍 Search
+        </button>
+
+        {% if error_message %}
+        <div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:6px; margin-top:15px; text-align:center; font-weight:500;">
+            {{ error_message }}
+        </div>
+        {% endif %}
     </form>
 </div>
+{% endblock %}

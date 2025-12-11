@@ -1,35 +1,31 @@
-{% include 'navbar.html' %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emergency Details - {{ employee.Name }}</title>
-<style>
-body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 20px; }
-.container { max-width: 700px; margin: auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-h2 { color: #1a1a2e; }
-.qr { text-align: center; margin-top: 20px; }
-.qr img { width: 200px; height: 200px; cursor: pointer; }
-</style>
-</head>
-<body>
-<div class="container">
-    <h2>{{ employee.Name }} (ID: {{ employee_id }})</h2>
-    <p><strong>DOB:</strong> {{ employee['Date of Birth'] }}</p>
-    <p><strong>Gender:</strong> {{ employee.Gender }}</p>
-    <h3>Emergency Details</h3>
+{% extends "base.html" %}
+{% block title %}Emergency Info{% endblock %}
+
+{% block content %}
+<h2>Emergency Information – {{ employee_id }}</h2>
+
+<div style="padding:20px; background:#f5f5f5; border-radius:10px;">
+    <p><strong>Name:</strong> {{ employee['Name'] }}</p>
+    <p><strong>Date of Birth:</strong> {{ employee['Date of Birth'] }}</p>
+    <p><strong>Gender:</strong> {{ employee['Gender'] }}</p>
+
+    <h3>Emergency Contact</h3>
     <p><strong>Blood Group:</strong> {{ employee['Emergency Details']['Blood group'] }}</p>
-    <p><strong>Contact Person:</strong> {{ employee['Emergency Details']['Contact Person Name'] }} ({{ employee['Emergency Details']['Relation'] }})</p>
+    <p><strong>Contact Person:</strong> {{ employee['Emergency Details']['Contact Person Name'] }}</p>
+    <p><strong>Relation:</strong> {{ employee['Emergency Details']['Relation'] }}</p>
     <p><strong>Phone:</strong> {{ employee['Emergency Details']['Phone Number'] }}</p>
     <p><strong>Company Phone:</strong> {{ employee['Emergency Details']['Company Phone Number'] }}</p>
 
-    <div class="qr">
-        <p>Scan QR to view this page:</p>
-        <a href="{{ url_for('emergency_details_page', employee_id=employee_id) }}">
-            <img src="{{ qr_url }}" alt="QR Code">
-        </a>
-    </div>
+    <h3>QR Code</h3>
+    {% if qr_base64 %}
+        <img class="qr" src="{{ qr_base64 }}">
+    {% else %}
+        <div class="msg error">No QR available.</div>
+    {% endif %}
+
+    {% if qr_url %}
+        <br><br>
+        <a class="btn" href="{{ qr_url }}" target="_blank">Download QR (Cloudinary)</a>
+    {% endif %}
 </div>
-</body>
-</html>
+{% endblock %}

@@ -1,80 +1,159 @@
-<style>
-.navbar {
-    background: #1a1a2e; /* dark navy */
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    font-family: "Segoe UI", sans-serif;
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employees</title>
 
-.navbar-title {
-    font-size: 22px;
-    font-weight: bold;
-    color: white;
-}
+    <style>
+        body { 
+            font-family: "Segoe UI", sans-serif; 
+            padding: 0; 
+            margin: 0; 
+            background: #f4f6fa;
+        }
 
-.nav-links {
-    display: flex;
-    gap: 22px;
-}
+        /* NAVBAR */
+        .navbar {
+            background: #1a1a2e; 
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    transition: 0.25s ease;
-    padding: 6px 10px;
-    border-radius: 5px;
-}
+        .navbar-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+        }
 
-.nav-links a:hover {
-    background: rgba(255, 255, 255, 0.28);
-}
+        .nav-links {
+            display: flex;
+            gap: 22px;
+        }
 
-.hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
-}
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: 0.25s ease;
+            padding: 6px 10px;
+            border-radius: 5px;
+        }
 
-.hamburger span {
-    width: 26px;
-    height: 3px;
-    background: white;
-    border-radius: 5px;
-}
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
 
-@media (max-width: 768px) {
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(10px);
-        flex-direction: column;
-        width: 200px;
-        padding: 15px;
-        border-bottom-left-radius: 12px;
-    }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
 
-    .nav-links.mobile-visible {
-        display: flex;
-    }
+        .hamburger span {
+            width: 26px;
+            height: 3px;
+            background: white;
+            border-radius: 5px;
+        }
 
-    .hamburger {
-        display: flex;
-    }
-}
-</style>
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                width: 200px;
+                padding: 15px;
+                border-bottom-left-radius: 12px;
+            }
 
+            .nav-links.mobile-visible {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+
+
+        /* PAGE CONTENT */
+        .container {
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        a.btn {
+            padding: 10px 16px;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-right: 10px;
+            font-size: 15px;
+        }
+
+        a.btn:hover {
+            background: #005fcc;
+        }
+
+        table {
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td { 
+            padding: 12px; 
+            border-bottom: 1px solid #ddd; 
+            text-align: left; 
+        }
+
+        th {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        img {
+            width: 80px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button.delete-btn {
+            padding: 8px 14px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.delete-btn:hover {
+            background: darkred;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
 <nav class="navbar">
     <div class="navbar-title">Emergency System</div>
 
@@ -87,12 +166,49 @@
     <div class="nav-links" id="navLinks">
         <a href="{{ url_for('index') }}">👥 Employee List</a>
         <a href="{{ url_for('add_employee_page') }}">➕ Add Employee</a>
-        <a href="{{ url_for('edit_employee_search') }}">🚑 Emergency Details</a>
+        <a href="{{ url_for('edit_employee_search') }}">✏️ Edit Employee</a>
     </div>
 </nav>
+
+<div class="container">
+
+<h1>Employee List</h1>
+
+<a href="/add" class="btn">➕ Add Employee</a>
+<a href="/edit_employee_search" class="btn">✏️ Edit Employee</a>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>QR Code</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for id, emp in employees.items() %}
+    <tr>
+        <td>{{ id }}</td>
+        <td>{{ emp.details["Name"] }}</td>
+        <td><img src="{{ emp.qr_base64 }}"></td>
+        <td>
+            <a href="/employee/{{ id }}" class="btn">View</a>
+            <a href="{{ emp.qr_url }}" target="_blank" class="btn">Download QR</a>
+
+            <form action="/delete/{{ id }}" method="POST" style="display:inline;">
+                <button class="delete-btn">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</div>
 
 <script>
 function toggleMenu() {
     document.getElementById("navLinks").classList.toggle("mobile-visible");
 }
 </script>
+
+</body>
+</html>
