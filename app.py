@@ -7,6 +7,7 @@ import base64
 import os
 import cloudinary
 import cloudinary.uploader
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -22,7 +23,13 @@ employees = {}
 
 # ---------------- QR Code Function ----------------
 def generate_qr_code(employee_id, name, logo_path="static/images/company_logo.jpg"):
+    """
+    Generates a QR code pointing to the employee page.
+    Uploads QR PNG to Cloudinary.
+    Returns both Cloudinary URL and base64 string.
+    """
     data = f"{request.host_url}employee/{employee_id}"
+
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -50,11 +57,11 @@ def generate_qr_code(employee_id, name, logo_path="static/images/company_logo.jp
     qr_img.save(buffered, format="PNG")
     buffered.seek(0)
 
-    # Convert to base64
+    # Convert to base64 for inline display
     qr_b64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
     qr_b64_str = f"data:image/png;base64,{qr_b64}"
 
-    # Upload to Cloudinary
+    # Upload PNG to Cloudinary
     buffered.seek(0)
     upload_result = cloudinary.uploader.upload(
         buffered,
@@ -64,14 +71,28 @@ def generate_qr_code(employee_id, name, logo_path="static/images/company_logo.jp
         resource_type="image"
     )
     cloudinary_url = upload_result.get("secure_url")
+
     return cloudinary_url, qr_b64_str
 
-# ===================== ROUTES =====================
+# ---------------- Template Filter for DOB ----------------
+@app.template_filter('datetimeformat')
+def datetimeformat(value):
+    """Convert yyyy-mm-dd to dd/mm/yyyy"""
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").strftime("%d/%m/%Y")
+    except:
+        return value
 
+# ============================================================
+# ROUTES
+# ============================================================
+
+# Home Page
 @app.route('/')
 def index():
     return render_template("index.html", employees=employees)
 
+# Add Employee
 @app.route('/add', methods=['GET', 'POST'])
 def add_employee_page():
     message = None
@@ -81,7 +102,18 @@ def add_employee_page():
     if request.method == 'POST':
         employee_id = request.form['employee_id'].strip()
         name = request.form['name']
-        dob = request.form['dob']
+        dob_input = request.form['dob'].strip()
+        # Convert dd/mm/yyyy to yyyy-mm-dd
+        try:
+            dob = datetime.strptime(dob_input, "%d/%m/%Y").strftime("%Y-%m-%d")
+        except ValueError:
+            message = "Invalid Date format. Use dd/mm/yyyy."
+            return render_template("add_employee_form.html",
+                                   message=message,
+                                   new_employee_id=new_employee_id,
+                                   json_output=json_output,
+                                   employees=employees)
+
         gender = request.form['gender']
         blood_group = request.form['blood_group']
         contact_person_name = request.form['contact_person_name']
@@ -105,12 +137,17 @@ def add_employee_page():
                     "Company Phone Number": company_phone_number
                 }
             }
+
+            # Generate QR code and upload to Cloudinary
             cloud_url, qr_b64 = generate_qr_code(employee_id, name)
+
+            # Save in memory
             employees[employee_id] = {
                 "details": employee_data,
                 "qr_url": cloud_url,
                 "qr_base64": qr_b64
             }
+
             message = f"Employee {name} added successfully!"
             new_employee_id = employee_id
             json_output = json.dumps(employee_data, indent=4)
@@ -123,6 +160,7 @@ def add_employee_page():
         employees=employees
     )
 
+# Edit Employee
 @app.route('/edit/<employee_id>', methods=['GET', 'POST'])
 def edit_employee(employee_id):
     if employee_id not in employees:
@@ -133,7 +171,19 @@ def edit_employee(employee_id):
 
     if request.method == 'POST':
         name = request.form['name']
-        dob = request.form['dob']
+        dob_input = request.form['dob'].strip()
+        # Convert dd/mm/yyyy to yyyy-mm-dd
+        try:
+            dob = datetime.strptime(dob_input, "%d/%m/%Y").strftime("%Y-%m-%d")
+        except ValueError:
+            message = "Invalid Date format. Use dd/mm/yyyy."
+            return render_template("edit_employee.html",
+                                   employee_id=employee_id,
+                                   employee=emp["details"],
+                                   message=message,
+                                   qr_base64=emp.get("qr_base64"),
+                                   qr_url=emp.get("qr_url"))
+
         gender = request.form['gender']
         blood_group = request.form['blood_group']
         contact_person_name = request.form['contact_person_name']
@@ -154,6 +204,7 @@ def edit_employee(employee_id):
             }
         })
 
+        # Regenerate QR code in Cloudinary and base64
         cloud_url, qr_b64 = generate_qr_code(employee_id, name)
         emp["qr_url"] = cloud_url
         emp["qr_base64"] = qr_b64
@@ -164,28 +215,34 @@ def edit_employee(employee_id):
         employee_id=employee_id,
         employee=emp["details"],
         message=message,
-        employees=employees
+        qr_base64=emp.get("qr_base64"),
+        qr_url=emp.get("qr_url")
     )
 
+# Delete Employee
 @app.route('/delete/<employee_id>', methods=['POST'])
 def delete_employee(employee_id):
     if employee_id in employees:
         del employees[employee_id]
     return redirect(url_for('index'))
 
+# Emergency Details Page
 @app.route('/employee/<employee_id>')
 def emergency_details_page(employee_id):
     if employee_id not in employees:
         return f"Employee ID {employee_id} not found.", 404
+
     emp = employees[employee_id]
+
     return render_template(
         "emergency_details.html",
         employee_id=employee_id,
         employee=emp["details"],
-        qr_url=emp["qr_url"],
-        qr_base64=emp["qr_base64"]
+        qr_url=emp.get("qr_url"),
+        qr_base64=emp.get("qr_base64")
     )
 
+# Search Page
 @app.route('/edit_employee_search', methods=['GET', 'POST'])
 def edit_employee_search():
     error_message = None
@@ -197,10 +254,8 @@ def edit_employee_search():
             error_message = f"Employee ID {employee_id} not found."
         else:
             return redirect(url_for('edit_employee', employee_id=employee_id))
-    return render_template(
-        "edit_employee_search.html",
-        error_message=error_message
-    )
+    return render_template("edit_employee_search.html", error_message=error_message)
 
+# Main
 if __name__ == "__main__":
     app.run(debug=True)

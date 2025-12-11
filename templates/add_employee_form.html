@@ -2,13 +2,14 @@
 {% block title %}Add Employee{% endblock %}
 
 {% block content %}
-<h2>Add New Employee</h2>
+<h1>Add New Employee</h1>
 
 {% if message %}
-<div class="msg success">{{ message }}</div>
+<div class="msg">{{ message }}</div>
 {% endif %}
 
 <form method="POST">
+
     <label>Employee ID</label>
     <input type="text" name="employee_id" required>
 
@@ -16,14 +17,20 @@
     <input type="text" name="name" required>
 
     <label>Date of Birth</label>
-    <input type="date" name="dob" required>
+    <input type="text" name="dob" 
+           placeholder="dd/mm/yyyy" 
+           pattern="\d{2}/\d{2}/\d{4}" 
+           required>
 
     <label>Gender</label>
     <select name="gender" required>
-        <option>Male</option><option>Female</option><option>Other</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
     </select>
 
     <h3>Emergency Details</h3>
+
     <label>Blood Group</label>
     <input type="text" name="blood_group" required>
 
@@ -44,12 +51,16 @@
 
 {% if new_employee_id %}
 <hr>
-<h3>Generated QR Code:</h3>
-<img class="qr" src="{{ employees[new_employee_id].qr_base64 }}">
-<br><br>
-<a class="btn" href="{{ employees[new_employee_id].qr_url }}" target="_blank">Download QR from Cloudinary</a>
+<div class="qr-container">
+    <h3>Generated QR Code</h3>
+    <img src="{{ employees[new_employee_id].qr_base64 }}" width="200">
+    <br><br>
+    <a href="{{ employees[new_employee_id].qr_url }}" target="_blank">Download QR from Cloudinary</a>
+</div>
 
 <h3>Employee JSON</h3>
+<div class="json-box">
 <pre>{{ json_output }}</pre>
+</div>
 {% endif %}
 {% endblock %}
