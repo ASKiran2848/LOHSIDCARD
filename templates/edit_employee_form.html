@@ -1,0 +1,36 @@
+{% include 'navbar.html' %}
+<div style="padding: 20px; max-width: 600px; margin: auto;">
+    <h2>Edit Employee - {{ employee.Name }}</h2>
+
+    {% if message %}
+        <p style="color: green; font-weight: bold;">{{ message }}</p>
+    {% endif %}
+
+    <form method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+        <label>Name:</label>
+        <input type="text" name="name" value="{{ employee.Name }}" required>
+
+        <label>Date of Birth:</label>
+        <input type="date" name="dob" value="{{ employee['Date of Birth'] }}" required>
+
+        <label>Gender:</label>
+        <input type="text" name="gender" value="{{ employee.Gender }}" required>
+
+        <label>Blood Group:</label>
+        <input type="text" name="blood_group" value="{{ employee['Emergency Details']['Blood group'] }}" required>
+
+        <label>Contact Person Name:</label>
+        <input type="text" name="contact_person_name" value="{{ employee['Emergency Details']['Contact Person Name'] }}" required>
+
+        <label>Relation:</label>
+        <input type="text" name="relation" value="{{ employee['Emergency Details']['Relation'] }}" required>
+
+        <label>Phone Number:</label>
+        <input type="text" name="phone_number" value="{{ employee['Emergency Details']['Phone Number'] }}" required>
+
+        <label>Company Phone Number:</label>
+        <input type="text" name="company_phone_number" value="{{ employee['Emergency Details']['Company Phone Number'] }}" required>
+
+        <button type="submit" style="padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">Update</button>
+    </form>
+</div>
