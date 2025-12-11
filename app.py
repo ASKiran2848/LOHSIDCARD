@@ -8,13 +8,15 @@ import os
 
 app = Flask(__name__)
 
+# ----------------------------
 # In-memory employees storage
+# ----------------------------
 employees = {}
 
-
-# ---------- QR Code Function ----------
-def generate_qr_code(employee_id, logo_path="static/images/company_logo.jpg"):
-    url = f"http://127.0.0.1:5000/employee/{employee_id}"  # Direct link to employee page
+# ----------------------------
+# QR Code generator
+# ----------------------------
+def generate_qr_code(url, logo_path="static/images/company_logo.jpg"):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -32,7 +34,6 @@ def generate_qr_code(employee_id, logo_path="static/images/company_logo.jpg"):
         logo_size = qr_width // 4
         logo = logo.resize((logo_size, logo_size), Image.Resampling.LANCZOS)
         pos = ((qr_width - logo_size) // 2, (qr_height - logo_size) // 2)
-
         if logo.mode in ('RGBA', 'LA'):
             qr_img.paste(logo, pos, mask=logo)
         else:
@@ -43,18 +44,17 @@ def generate_qr_code(employee_id, logo_path="static/images/company_logo.jpg"):
     qr_b64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
     return f"data:image/png;base64,{qr_b64}"
 
-
-# ============================================================
+# ----------------------------
 # ROUTES
-# ============================================================
+# ----------------------------
 
-# ---------- Home Page ----------
+# Home page - list all employees
 @app.route('/')
 def index():
     return render_template("index.html", employees=employees)
 
 
-# ---------- Add Employee ----------
+# Add new employee
 @app.route('/add', methods=['GET', 'POST'])
 def add_employee_page():
     message = None
@@ -72,7 +72,6 @@ def add_employee_page():
         phone_number = request.form['phone_number']
         company_phone_number = request.form['company_phone_number']
 
-        # Check duplicate
         if employee_id in employees:
             message = f"Employee ID {employee_id} already exists!"
         else:
@@ -90,10 +89,12 @@ def add_employee_page():
                 }
             }
 
-            # Generate QR code pointing to employee page
-            qr_url = generate_qr_code(employee_id)
+            # Generate URL to employee page
+            base_url = request.url_root.strip('/')  # e.g., http://127.0.0.1:5000
+            employee_url = f"{base_url}/employee/{employee_id}"
+            qr_url = generate_qr_code(employee_url)
 
-            # Save in employees dict
+            # Save employee
             employees[employee_id] = {
                 "details": employee_data,
                 "qr_url": qr_url
@@ -110,27 +111,22 @@ def add_employee_page():
         json_output=json_output
     )
 
-
-# ---------- Edit Employee Search ----------
+# Search employee for edit or view
 @app.route('/edit_employee_search', methods=['GET', 'POST'])
 def edit_employee_search():
     error_message = None
-
     if request.method == 'POST':
         employee_id = request.form.get('employee_id', "").strip()
-
-        if employee_id == "":
+        if not employee_id:
             error_message = "Please enter a valid Employee ID."
         elif employee_id not in employees:
             error_message = f"Employee ID {employee_id} not found."
         else:
-            # Redirect to edit page
-            return redirect(url_for('edit_employee', employee_id=employee_id))
+            return redirect(url_for('emergency_details_page', employee_id=employee_id))
 
     return render_template("edit_employee_search.html", message=error_message)
 
-
-# ---------- Emergency Details Page ----------
+# View employee emergency details
 @app.route('/employee/<employee_id>')
 def emergency_details_page(employee_id):
     if employee_id not in employees:
@@ -144,10 +140,9 @@ def emergency_details_page(employee_id):
         qr_url=emp["qr_url"]
     )
 
-
-# ---------- Edit Employee ----------
+# Edit employee details
 @app.route('/edit/<employee_id>', methods=['GET', 'POST'])
-def edit_employee(employee_id):
+def edit_employee_page(employee_id):
     if employee_id not in employees:
         return f"Employee ID {employee_id} not found.", 404
 
@@ -164,11 +159,10 @@ def edit_employee(employee_id):
         phone_number = request.form['phone_number']
         company_phone_number = request.form['company_phone_number']
 
-        # Update employee data
-        emp['details']['Name'] = name
-        emp['details']['Date of Birth'] = dob
-        emp['details']['Gender'] = gender
-        emp['details']['Emergency Details'] = {
+        emp["details"]["Name"] = name
+        emp["details"]["Date of Birth"] = dob
+        emp["details"]["Gender"] = gender
+        emp["details"]["Emergency Details"] = {
             "Blood group": blood_group,
             "Contact Person Name": contact_person_name,
             "Relation": relation,
@@ -176,15 +170,16 @@ def edit_employee(employee_id):
             "Company Phone Number": company_phone_number
         }
 
-        # Regenerate QR code
-        emp['qr_url'] = generate_qr_code(employee_id)
+        # Regenerate QR with updated URL
+        base_url = request.url_root.strip('/')
+        employee_url = f"{base_url}/employee/{employee_id}"
+        emp["qr_url"] = generate_qr_code(employee_url)
 
-        return redirect(url_for('index'))
+        message = "Employee details updated successfully!"
 
-    return render_template("edit_employee_form.html", employee_id=employee_id, employee=emp['details'], message=message)
+    return render_template("edit_employee_form.html", employee_id=employee_id, employee=emp["details"], message=message)
 
-
-# ---------- Delete Employee ----------
+# Delete employee
 @app.route('/delete/<employee_id>', methods=['POST'])
 def delete_employee(employee_id):
     if employee_id in employees:
@@ -192,6 +187,8 @@ def delete_employee(employee_id):
     return redirect(url_for('index'))
 
 
-# ---------- Main ----------
+# ----------------------------
+# Run the app
+# ----------------------------
 if __name__ == "__main__":
     app.run(debug=True)
