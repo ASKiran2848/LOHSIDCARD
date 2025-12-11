@@ -1,0 +1,98 @@
+<style>
+.navbar {
+    background: #1a1a2e; /* dark navy */
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.navbar-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+}
+
+.nav-links {
+    display: flex;
+    gap: 22px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: 0.25s ease;
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+
+.nav-links a:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.hamburger span {
+    width: 26px;
+    height: 3px;
+    background: white;
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        width: 200px;
+        padding: 15px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .nav-links.mobile-visible {
+        display: flex;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+}
+</style>
+
+<nav class="navbar">
+    <div class="navbar-title">Emergency System</div>
+
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="nav-links" id="navLinks">
+        <a href="{{ url_for('index') }}">👥 Employee List</a>
+        <a href="{{ url_for('add_employee_page') }}">➕ Add Employee</a>
+        <a href="{{ url_for('edit_employee_search') }}">🚑 Emergency Details</a>
+    </div>
+</nav>
+
+<script>
+function toggleMenu() {
+    document.getElementById("navLinks").classList.toggle("mobile-visible");
+}
+</script>
