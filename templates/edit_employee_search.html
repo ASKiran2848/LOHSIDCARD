@@ -2,23 +2,109 @@
 {% block title %}Search Employee{% endblock %}
 
 {% block content %}
-<div style="max-width:500px; margin:40px auto; padding:20px; background:#f9f9f9; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-    <h2 style="text-align:center; margin-bottom:20px;">Search Employee to Edit</h2>
+<style>
+/* ==========================
+   Layout
+   ========================== */
+.search-container {
+  max-width: 480px;
+  margin: 4rem auto;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
 
-    <form method="POST">
-        <input type="text" name="employee_id" placeholder="Enter Employee ID" 
-               style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; font-size:16px;">
-        
-        <button type="submit" 
-                style="width:100%; margin-top:15px; padding:12px; background:#007bff; color:white; border:none; border-radius:6px; font-size:16px; cursor:pointer; transition:0.3s;">
-            🔍 Search
-        </button>
+/* ==========================
+   Heading
+   ========================== */
+.search-container h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+}
 
-        {% if error_message %}
-        <div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:6px; margin-top:15px; text-align:center; font-weight:500;">
-            {{ error_message }}
-        </div>
-        {% endif %}
-    </form>
+/* ==========================
+   Input
+   ========================== */
+.search-container input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ==========================
+   Button
+   ========================== */
+.search-container button {
+  width: 100%;
+  margin-top: 1.4rem;
+  padding: 0.9rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-container button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25);
+}
+
+/* ==========================
+   Error Message
+   ========================== */
+.error-msg {
+  margin-top: 1.2rem;
+  padding: 0.9rem;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* ==========================
+   Responsive
+   ========================== */
+@media (max-width: 480px) {
+  .search-container {
+    margin: 2rem 1rem;
+    padding: 2rem 1.5rem;
+  }
+}
+</style>
+
+<div class="search-container">
+  <h2>Search Employee to Edit</h2>
+
+  <form method="POST">
+    <input
+      type="text"
+      name="employee_id"
+      placeholder="Enter Employee ID"
+      required
+    >
+
+    <button type="submit">🔍 Search</button>
+
+    {% if error_message %}
+      <div class="error-msg">{{ error_message }}</div>
+    {% endif %}
+  </form>
 </div>
 {% endblock %}
