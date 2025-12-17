@@ -153,11 +153,10 @@ button:hover {
     <input type="text" name="name" value="{{ employee['Name'] }}" required>
 
     <label>Date of Birth</label>
-    <input type="text"
+    <!-- ✅ FIXED -->
+    <input type="date"
            name="dob"
-           value="{{ employee['Date of Birth'] | datetimeformat }}"
-           placeholder="dd/mm/yyyy"
-           pattern="\d{2}/\d{2}/\d{4}"
+           value="{{ employee['Date of Birth'] }}"
            required>
 
     <label>Gender</label>
