@@ -1,153 +1,188 @@
-
 {% block content %}
 <style>
 /* ==========================
-   Emergency Card UI
+   Emergency Medical Card
    ========================== */
-.emergency-container {
-  max-width: 700px;
-  margin: 2.5rem auto;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+.em-card {
+  max-width: 520px;
+  margin: 2rem auto;
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
+  border-radius: 16px;
+  padding: 1.6rem;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.emergency-container h2 {
-  font-size: 1.8rem;
-  color: #0f172a;
-  margin-bottom: 1.5rem;
-  text-align: center;
+.em-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
 }
 
-.info-block p {
-  font-size: 1rem;
-  margin: 0.6rem 0;
-  color: #1f2937;
+.em-badge {
+  background: #dc2626;
+  color: white;
+  font-weight: 700;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
 }
 
-.info-block strong {
-  color: #0f172a;
+.em-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111827;
 }
 
-.section-title {
-  margin-top: 1.8rem;
-  margin-bottom: 0.8rem;
-  font-size: 1.2rem;
-  color: #b91c1c;
-  border-bottom: 2px solid #fee2e2;
-  padding-bottom: 0.3rem;
+.em-sub {
+  font-size: 0.85rem;
+  color: #6b7280;
 }
 
 /* ==========================
-   Phone Links
+   Info Rows
    ========================== */
-.phone-link {
-  color: #2563eb;
+.em-section {
+  margin-top: 1.4rem;
+}
+
+.em-section h3 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #dc2626;
+  margin-bottom: 0.6rem;
+}
+
+.em-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.em-row:last-child {
+  border-bottom: none;
+}
+
+.em-label {
+  color: #6b7280;
+}
+
+.em-value {
   font-weight: 600;
-  text-decoration: none;
-}
-
-.phone-link:hover {
-  text-decoration: underline;
+  color: #111827;
+  text-align: right;
 }
 
 /* ==========================
-   QR Code
+   Call Buttons
    ========================== */
-.qr-section {
-  margin-top: 2.5rem;
+.call-actions {
+  margin-top: 1.6rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.call-btn {
   text-align: center;
-}
-
-.qr-section img {
-  width: 200px;
-  padding: 0.75rem;
-  background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* ==========================
-   Download Button
-   ========================== */
-.btn {
-  display: inline-block;
-  margin-top: 1.2rem;
-  padding: 0.7rem 1.2rem;
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
-  color: #ffffff;
+  padding: 0.7rem;
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
+  color: white;
+  font-size: 0.95rem;
 }
 
-.btn:hover {
+.call-primary {
+  background: #2563eb;
+}
+
+.call-secondary {
+  background: #059669;
+}
+
+.call-btn:hover {
   opacity: 0.9;
 }
 
 /* ==========================
-   Mobile Friendly
+   Mobile
    ========================== */
-@media (max-width: 600px) {
-  .emergency-container {
-    margin: 1.5rem;
-    padding: 1.5rem;
+@media (max-width: 480px) {
+  .em-card {
+    margin: 1rem;
   }
 
-  .emergency-container h2 {
-    font-size: 1.5rem;
+  .call-actions {
+    grid-template-columns: 1fr;
   }
 }
 </style>
 
-<div class="emergency-container">
-  <h2>Emergency Information – {{ employee_id }}</h2>
+<div class="em-card">
 
-  <div class="info-block">
-    <p><strong>Name:</strong> {{ employee['Name'] }}</p>
-    <p><strong>Date of Birth:</strong> {{ employee['Date of Birth'] | datetimeformat }}</p>
-    <p><strong>Gender:</strong> {{ employee['Gender'] }}</p>
+  <!-- Header -->
+  <div class="em-header">
+    <div class="em-badge">EMERGENCY</div>
+    <div>
+      <div class="em-title">{{ employee['Name'] }}</div>
+      <div class="em-sub">Employee ID: {{ employee_id }}</div>
+    </div>
   </div>
 
-  <div class="section-title">Emergency Contact</div>
-
-  <div class="info-block">
-    <p><strong>Blood Group:</strong> {{ employee['Emergency Details']['Blood group'] }}</p>
-    <p><strong>Contact Person:</strong> {{ employee['Emergency Details']['Contact Person Name'] }}</p>
-    <p><strong>Relation:</strong> {{ employee['Emergency Details']['Relation'] }}</p>
-
-    <!-- ✅ Clickable Phones -->
-    <p>
-      <strong>Phone:</strong>
-      <a class="phone-link"
-         href="tel:{{ employee['Emergency Details']['Phone Number'] | replace(' ', '') }}">
-        {{ employee['Emergency Details']['Phone Number'] }}
-      </a>
-    </p>
-
-    <p>
-      <strong>Company Phone:</strong>
-      <a class="phone-link"
-         href="tel:{{ employee['Emergency Details']['Company Phone Number'] | replace(' ', '') }}">
-        {{ employee['Emergency Details']['Company Phone Number'] }}
-      </a>
-    </p>
+  <!-- Personal Info -->
+  <div class="em-section">
+    <h3>Personal Information</h3>
+    <div class="em-row">
+      <div class="em-label">Date of Birth</div>
+      <div class="em-value">{{ employee['Date of Birth'] | datetimeformat }}</div>
+    </div>
+    <div class="em-row">
+      <div class="em-label">Gender</div>
+      <div class="em-value">{{ employee['Gender'] }}</div>
+    </div>
+    <div class="em-row">
+      <div class="em-label">Blood Group</div>
+      <div class="em-value" style="color:#dc2626;">
+        {{ employee['Emergency Details']['Blood group'] }}
+      </div>
+    </div>
   </div>
 
-  <!-- <div class="qr-section">
-    <h3 class="section-title" style="border:none;color:#0f172a;">QR Code</h3>
+  <!-- Emergency Contact -->
+  <div class="em-section">
+    <h3>Emergency Contact</h3>
+    <div class="em-row">
+      <div class="em-label">Contact Person</div>
+      <div class="em-value">
+        {{ employee['Emergency Details']['Contact Person Name'] }}
+      </div>
+    </div>
+    <div class="em-row">
+      <div class="em-label">Relation</div>
+      <div class="em-value">
+        {{ employee['Emergency Details']['Relation'] }}
+      </div>
+    </div>
+  </div>
 
-    {% if qr_base64 %}
-      <img src="{{ qr_base64 }}" alt="QR Code">
-    {% else %}
-      <p>No QR available.</p>
-    {% endif %}
+  <!-- Call Buttons -->
+  <div class="call-actions">
+    <a class="call-btn call-primary"
+       href="tel:{{ employee['Emergency Details']['Phone Number'] | replace(' ', '') }}">
+      📞 Emergency Contact
+    </a>
 
-    {% if qr_url %}
-      <br>
-      <a class="btn" href="{{ qr_url }}" target="_blank">Download QR</a>
-    {% endif %}
-  </div> -->
+    <a class="call-btn call-secondary"
+       href="tel:{{ employee['Emergency Details']['Company Phone Number'] | replace(' ', '') }}">
+      🏢 Company
+    </a>
+  </div>
+
 </div>
 {% endblock %}
+
