@@ -2,30 +2,173 @@
 {% block title %}Add Employee{% endblock %}
 
 {% block content %}
-<h1>Add New Employee</h1>
+<style>
+/* ==========================
+   Global Reset & Base Styles
+   ========================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-{% if message %}
-<div class="msg">{{ message }}</div>
-{% endif %}
+body {
+  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(135deg, #eef2f7, #f9fbfd);
+  color: #1f2937;
+  line-height: 1.6;
+}
 
-<form method="POST" novalidate>
+.container {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+}
+
+h3 {
+  margin: 2.5rem 0 1rem;
+  font-size: 1.2rem;
+  color: #1e293b;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.msg {
+  background: #ecfeff;
+  color: #155e75;
+  border: 1px solid #67e8f9;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 1.5rem;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder {
+  color: #9ca3af;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+h1,
+h3,
+button,
+.msg {
+  grid-column: 1 / -1;
+}
+
+button {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+}
+
+.qr-container {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.qr-container img {
+  padding: 0.75rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.json-box {
+  margin-top: 1.5rem;
+  background: #0f172a;
+  color: #e5e7eb;
+  padding: 1.2rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+    margin: 1.5rem;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div class="container">
+  <h1>Add New Employee</h1>
+
+  {% if message %}
+  <div class="msg">{{ message }}</div>
+  {% endif %}
+
+  <form method="POST">
 
     <label for="employee_id">Employee ID</label>
     <input type="text" id="employee_id" name="employee_id" required>
 
     <label for="name">Name</label>
-    <input type="text" id="name" name="name" autocomplete="name" required>
+    <input type="text" id="name" name="name" required>
 
     <label for="dob">Date of Birth</label>
-    <!-- Use browser-native date picker (YYYY-MM-DD) -->
     <input type="date" id="dob" name="dob" required>
 
     <label for="gender">Gender</label>
     <select id="gender" name="gender" required>
-        <option value="">-- Select --</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
+      <option value="">-- Select --</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
     </select>
 
     <h3>Emergency Details</h3>
@@ -40,42 +183,25 @@
     <input type="text" id="relation" name="relation" required>
 
     <label for="phone_number">Contact Person Phone</label>
-    <input
-        type="tel"
-        id="phone_number"
-        name="phone_number"
-        pattern="[0-9+\-\s()]{7,}"
-        placeholder="+91 98765 43210"
-        required
-    >
+    <input type="tel" id="phone_number" name="phone_number" placeholder="+91 98765 43210" required>
 
     <label for="company_phone_number">Company Phone Number</label>
-    <input
-        type="tel"
-        id="company_phone_number"
-        name="company_phone_number"
-        pattern="[0-9+\-\s()]{7,}"
-        placeholder="+1 (555) 123-4567"
-        required
-    >
+    <input type="tel" id="company_phone_number" name="company_phone_number" placeholder="+1 (555) 123-4567" required>
 
     <button type="submit">Add Employee</button>
-</form>
+  </form>
 
-{% if new_employee_id %}
-<hr>
-<div class="qr-container">
+  {% if new_employee_id %}
+  <hr>
+  <div class="qr-container">
     <h3>Generated QR Code</h3>
-    <img src="{{ employees[new_employee_id].qr_base64 }}" alt="Employee QR Code" width="200">
-    <br><br>
-    <a href="{{ employees[new_employee_id].qr_url }}" target="_blank" rel="noopener">
-        Download QR from Cloudinary
-    </a>
-</div>
+    <img src="{{ employees[new_employee_id].qr_base64 }}" width="200" alt="QR Code">
+  </div>
 
-<h3>Employee JSON</h3>
-<div class="json-box">
-<pre>{{ json_output }}</pre>
+  <h3>Employee JSON</h3>
+  <div class="json-box">
+    <pre>{{ json_output }}</pre>
+  </div>
+  {% endif %}
 </div>
-{% endif %}
 {% endblock %}
