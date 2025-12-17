@@ -2,61 +2,209 @@
 {% block title %}Edit Employee{% endblock %}
 
 {% block content %}
-<h1>Edit Employee – {{ employee_id }}</h1>
+<style>
+/* ==========================
+   Base Layout
+   ========================== */
+.container {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
 
-{% if message %}
-<div class="msg">{{ message }}</div>
-{% endif %}
+h1 {
+  font-size: 1.9rem;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+}
 
-<form method="POST">
+h3 {
+  margin: 2rem 0 1rem;
+  font-size: 1.2rem;
+  color: #1e293b;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.msg {
+  background: #ecfeff;
+  color: #155e75;
+  border: 1px solid #67e8f9;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* ==========================
+   Form Styling
+   ========================== */
+form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 1.5rem;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+hr,
+h3,
+button {
+  grid-column: 1 / -1;
+}
+
+/* ==========================
+   Button
+   ========================== */
+button {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+}
+
+/* ==========================
+   QR Section
+   ========================== */
+.qr-container {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.qr-container img {
+  padding: 0.75rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.qr-container a {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.qr-container a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================
+   Responsive
+   ========================== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+    margin: 1.5rem;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div class="container">
+  <h1>Edit Employee – {{ employee_id }}</h1>
+
+  {% if message %}
+  <div class="msg">{{ message }}</div>
+  {% endif %}
+
+  <form method="POST">
     <label>Name</label>
     <input type="text" name="name" value="{{ employee['Name'] }}" required>
 
     <label>Date of Birth</label>
-    <input type="text" name="dob" 
-           value="{{ employee['Date of Birth'] | datetimeformat }}" 
-           placeholder="dd/mm/yyyy" 
-           pattern="\d{2}/\d{2}/\d{4}" 
+    <input type="text"
+           name="dob"
+           value="{{ employee['Date of Birth'] | datetimeformat }}"
+           placeholder="dd/mm/yyyy"
+           pattern="\d{2}/\d{2}/\d{4}"
            required>
 
     <label>Gender</label>
     <select name="gender" required>
-        <option value="Male" {% if employee['Gender']=='Male' %}selected{% endif %}>Male</option>
-        <option value="Female" {% if employee['Gender']=='Female' %}selected{% endif %}>Female</option>
-        <option value="Other" {% if employee['Gender']=='Other' %}selected{% endif %}>Other</option>
+      <option value="Male" {% if employee['Gender'] == 'Male' %}selected{% endif %}>Male</option>
+      <option value="Female" {% if employee['Gender'] == 'Female' %}selected{% endif %}>Female</option>
+      <option value="Other" {% if employee['Gender'] == 'Other' %}selected{% endif %}>Other</option>
     </select>
 
-    <hr>
     <h3>Emergency Details</h3>
 
     <label>Blood Group</label>
-    <input type="text" name="blood_group" value="{{ employee['Emergency Details']['Blood group'] }}" required>
+    <input type="text" name="blood_group"
+           value="{{ employee['Emergency Details']['Blood group'] }}" required>
 
     <label>Contact Person Name</label>
-    <input type="text" name="contact_person_name" value="{{ employee['Emergency Details']['Contact Person Name'] }}" required>
+    <input type="text" name="contact_person_name"
+           value="{{ employee['Emergency Details']['Contact Person Name'] }}" required>
 
     <label>Relation</label>
-    <input type="text" name="relation" value="{{ employee['Emergency Details']['Relation'] }}" required>
+    <input type="text" name="relation"
+           value="{{ employee['Emergency Details']['Relation'] }}" required>
 
     <label>Phone Number</label>
-    <input type="text" name="phone_number" value="{{ employee['Emergency Details']['Phone Number'] }}" required>
+    <input type="text" name="phone_number"
+           value="{{ employee['Emergency Details']['Phone Number'] }}" required>
 
     <label>Company Phone Number</label>
-    <input type="text" name="company_phone_number" value="{{ employee['Emergency Details']['Company Phone Number'] }}" required>
+    <input type="text" name="company_phone_number"
+           value="{{ employee['Emergency Details']['Company Phone Number'] }}" required>
 
     <button type="submit">Save Changes</button>
-</form>
+  </form>
 
-<div class="qr-container">
+  <div class="qr-container">
     <h3>Current QR Code</h3>
+
     {% if qr_base64 %}
-        <img src="{{ qr_base64 }}" width="200">
+      <img src="{{ qr_base64 }}" width="200" alt="QR Code">
     {% else %}
-        <p>No QR available.</p>
+      <p>No QR available.</p>
     {% endif %}
-    <br><br>
+
     {% if qr_url %}
-        <a href="{{ qr_url }}" target="_blank">Download QR (Cloudinary)</a>
+      <br>
+      <a href="{{ qr_url }}" target="_blank">Download QR (Cloudinary)</a>
     {% endif %}
+  </div>
 </div>
 {% endblock %}
