@@ -8,50 +8,56 @@
 <div class="msg">{{ message }}</div>
 {% endif %}
 
-<form method="POST">
+<form method="POST" novalidate>
 
-    <label>Employee ID</label>
-    <input type="text" name="employee_id" required>
+    <label for="employee_id">Employee ID</label>
+    <input type="text" id="employee_id" name="employee_id" required>
 
-    <label>Name</label>
-    <input type="text" name="name" required>
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" autocomplete="name" required>
 
-    <label>Date of Birth</label>
-    <input type="date" name="dob" 
-           placeholder="dd/mm/yyyy" 
-           pattern="\d{2}/\d{2}/\d{4}" 
-           required>
+    <label for="dob">Date of Birth</label>
+    <!-- Use browser-native date picker (YYYY-MM-DD) -->
+    <input type="date" id="dob" name="dob" required>
 
-    <label>Gender</label>
-    <select name="gender" required>
-        <option>Male</option>
-        <option>Female</option>
-        <option>Other</option>
+    <label for="gender">Gender</label>
+    <select id="gender" name="gender" required>
+        <option value="">-- Select --</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
     </select>
 
     <h3>Emergency Details</h3>
 
-    <label>Blood Group</label>
-    <input type="text" name="blood_group" required>
+    <label for="blood_group">Blood Group</label>
+    <input type="text" id="blood_group" name="blood_group" placeholder="O+" required>
 
-    <label>Contact Person Name</label>
-    <input type="text" name="contact_person_name" required>
+    <label for="contact_person_name">Contact Person Name</label>
+    <input type="text" id="contact_person_name" name="contact_person_name" required>
 
-    <label>Relation</label>
-    <input type="text" name="relation" required>
+    <label for="relation">Relation</label>
+    <input type="text" id="relation" name="relation" required>
 
-    <label>Contact Person Phone</label>
-    <input type="text" name="phone_number" required>
+    <label for="phone_number">Contact Person Phone</label>
+    <input
+        type="tel"
+        id="phone_number"
+        name="phone_number"
+        pattern="[0-9+\-\s()]{7,}"
+        placeholder="+91 98765 43210"
+        required
+    >
 
-    <label>Company Phone Number</label>
-<input
-  type="tel"
-  id="company_phone_number"
-  name="company_phone_number"
-  required
-  pattern="[0-9+\-\s()]{7,}"
-  placeholder="+1 (555) 123-4567"
->
+    <label for="company_phone_number">Company Phone Number</label>
+    <input
+        type="tel"
+        id="company_phone_number"
+        name="company_phone_number"
+        pattern="[0-9+\-\s()]{7,}"
+        placeholder="+1 (555) 123-4567"
+        required
+    >
 
     <button type="submit">Add Employee</button>
 </form>
@@ -60,9 +66,11 @@
 <hr>
 <div class="qr-container">
     <h3>Generated QR Code</h3>
-    <img src="{{ employees[new_employee_id].qr_base64 }}" width="200">
+    <img src="{{ employees[new_employee_id].qr_base64 }}" alt="Employee QR Code" width="200">
     <br><br>
-    <a href="{{ employees[new_employee_id].qr_url }}" target="_blank">Download QR from Cloudinary</a>
+    <a href="{{ employees[new_employee_id].qr_url }}" target="_blank" rel="noopener">
+        Download QR from Cloudinary
+    </a>
 </div>
 
 <h3>Employee JSON</h3>
