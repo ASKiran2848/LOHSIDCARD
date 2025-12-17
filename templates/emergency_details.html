@@ -2,30 +2,154 @@
 {% block title %}Emergency Info{% endblock %}
 
 {% block content %}
-<h2>Emergency Information – {{ employee_id }}</h2>
+<style>
+/* ==========================
+   Emergency Card UI
+   ========================== */
+.emergency-container {
+  max-width: 700px;
+  margin: 2.5rem auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
 
-<div style="padding:20px; background:#f5f5f5; border-radius:10px;">
+.emergency-container h2 {
+  font-size: 1.8rem;
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.info-block p {
+  font-size: 1rem;
+  margin: 0.6rem 0;
+  color: #1f2937;
+}
+
+.info-block strong {
+  color: #0f172a;
+}
+
+.section-title {
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+  color: #b91c1c;
+  border-bottom: 2px solid #fee2e2;
+  padding-bottom: 0.3rem;
+}
+
+/* ==========================
+   Phone Links
+   ========================== */
+.phone-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.phone-link:hover {
+  text-decoration: underline;
+}
+
+/* ==========================
+   QR Code
+   ========================== */
+.qr-section {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.qr-section img {
+  width: 200px;
+  padding: 0.75rem;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================
+   Download Button
+   ========================== */
+.btn {
+  display: inline-block;
+  margin-top: 1.2rem;
+  padding: 0.7rem 1.2rem;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #ffffff;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* ==========================
+   Mobile Friendly
+   ========================== */
+@media (max-width: 600px) {
+  .emergency-container {
+    margin: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .emergency-container h2 {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+<div class="emergency-container">
+  <h2>Emergency Information – {{ employee_id }}</h2>
+
+  <div class="info-block">
     <p><strong>Name:</strong> {{ employee['Name'] }}</p>
-    <p><strong>Date of Birth:</strong> {{ employee['Date of Birth'] }}</p>
+    <p><strong>Date of Birth:</strong> {{ employee['Date of Birth'] | datetimeformat }}</p>
     <p><strong>Gender:</strong> {{ employee['Gender'] }}</p>
+  </div>
 
-    <h3>Emergency Contact</h3>
+  <div class="section-title">Emergency Contact</div>
+
+  <div class="info-block">
     <p><strong>Blood Group:</strong> {{ employee['Emergency Details']['Blood group'] }}</p>
     <p><strong>Contact Person:</strong> {{ employee['Emergency Details']['Contact Person Name'] }}</p>
     <p><strong>Relation:</strong> {{ employee['Emergency Details']['Relation'] }}</p>
-    <p><strong>Phone:</strong> {{ employee['Emergency Details']['Phone Number'] }}</p>
-    <p><strong>Company Phone:</strong> {{ employee['Emergency Details']['Company Phone Number'] }}</p>
 
-    <h3>QR Code</h3>
+    <!-- ✅ Clickable Phones -->
+    <p>
+      <strong>Phone:</strong>
+      <a class="phone-link"
+         href="tel:{{ employee['Emergency Details']['Phone Number'] | replace(' ', '') }}">
+        {{ employee['Emergency Details']['Phone Number'] }}
+      </a>
+    </p>
+
+    <p>
+      <strong>Company Phone:</strong>
+      <a class="phone-link"
+         href="tel:{{ employee['Emergency Details']['Company Phone Number'] | replace(' ', '') }}">
+        {{ employee['Emergency Details']['Company Phone Number'] }}
+      </a>
+    </p>
+  </div>
+
+  <div class="qr-section">
+    <h3 class="section-title" style="border:none;color:#0f172a;">QR Code</h3>
+
     {% if qr_base64 %}
-        <img class="qr" src="{{ qr_base64 }}">
+      <img src="{{ qr_base64 }}" alt="QR Code">
     {% else %}
-        <div class="msg error">No QR available.</div>
+      <p>No QR available.</p>
     {% endif %}
 
     {% if qr_url %}
-        <br><br>
-        <a class="btn" href="{{ qr_url }}" target="_blank">Download QR (Cloudinary)</a>
+      <br>
+      <a class="btn" href="{{ qr_url }}" target="_blank">Download QR</a>
     {% endif %}
+  </div>
 </div>
 {% endblock %}
