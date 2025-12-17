@@ -2,31 +2,183 @@
 {% block title %}Employee List{% endblock %}
 
 {% block content %}
-<h2>Employee List</h2>
+<style>
+/* ==========================
+   Page Layout
+   ========================== */
+.page-container {
+  max-width: 1100px;
+  margin: 3rem auto;
+  padding: 2rem;
+}
 
-<a class="btn" href="{{ url_for('add_employee_page') }}">➕ Add Employee</a>
-<a class="btn" href="{{ url_for('edit_employee_search') }}">🔍 Edit Employee</a>
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>QR Code</th>
-        <th>Actions</th>
-    </tr>
-    {% for id, emp in employees.items() %}
-    <tr>
-        <td>{{ id }}</td>
-        <td>{{ emp.details['Name'] }}</td>
-        <td><img class="qr" src="{{ emp.qr_base64 }}"></td>
-        <td>
-            <a class="btn" href="/employee/{{ id }}">View</a>
-            <a class="btn" href="{{ emp.qr_url }}" target="_blank">Download QR</a>
-            <form action="/delete/{{ id }}" method="POST" style="display:inline;">
-                <button style="padding:6px 10px; background:red; color:white; border:none; border-radius:5px;">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+.page-header h2 {
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+/* ==========================
+   Buttons
+   ========================== */
+.btn {
+  display: inline-block;
+  margin-right: 0.6rem;
+  padding: 0.6rem 1.1rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.secondary {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn.danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+.btn:hover {
+  opacity: 0.92;
+}
+
+/* ==========================
+   Table
+   ========================== */
+.table-container {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+thead {
+  background: #f1f5f9;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+}
+
+th {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tr:last-child {
+  border-bottom: none;
+}
+
+/* ==========================
+   QR Image
+   ========================== */
+.qr {
+  width: 80px;
+  padding: 0.4rem;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ==========================
+   Actions
+   ========================== */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* ==========================
+   Responsive
+   ========================== */
+@media (max-width: 768px) {
+  .page-header {
+    gap: 1rem;
+  }
+
+  .btn {
+    margin-bottom: 0.5rem;
+  }
+}
+</style>
+
+<div class="page-container">
+  <div class="page-header">
+    <h2>Employee List</h2>
+    <div>
+      <a class="btn" href="{{ url_for('add_employee_page') }}">➕ Add Employee</a>
+      <a class="btn secondary" href="{{ url_for('edit_employee_search') }}">🔍 Edit Employee</a>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>QR Code</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for id, emp in employees.items() %}
+        <tr>
+          <td>{{ id }}</td>
+          <td>{{ emp.details['Name'] }}</td>
+          <td>
+            <img class="qr" src="{{ emp.qr_base64 }}" alt="QR Code">
+          </td>
+          <td>
+            <div class="actions">
+              <a class="btn secondary" href="/employee/{{ id }}">View</a>
+              <a class="btn" href="{{ emp.qr_url }}" target="_blank">Download QR</a>
+
+              <form action="/delete/{{ id }}" method="POST" style="display:inline;">
+                <button class="btn danger" type="submit"
+                        onclick="return confirm('Delete employee {{ id }}?')">
+                  Delete
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" style="text-align:center; padding:2rem;">
+            No employees found.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
