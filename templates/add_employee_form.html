@@ -17,7 +17,7 @@
     <input type="text" name="name" required>
 
     <label>Date of Birth</label>
-    <input type="text" name="dob" 
+    <input type="date" name="dob" 
            placeholder="dd/mm/yyyy" 
            pattern="\d{2}/\d{2}/\d{4}" 
            required>
@@ -44,7 +44,14 @@
     <input type="text" name="phone_number" required>
 
     <label>Company Phone Number</label>
-    <input type="text" name="company_phone_number" required>
+<input
+  type="tel"
+  id="company_phone_number"
+  name="company_phone_number"
+  required
+  pattern="[0-9+\-\s()]{7,}"
+  placeholder="+1 (555) 123-4567"
+>
 
     <button type="submit">Add Employee</button>
 </form>
