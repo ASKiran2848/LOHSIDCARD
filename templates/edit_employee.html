@@ -3,9 +3,6 @@
 
 {% block content %}
 <style>
-/* ==========================
-   Base Layout
-   ========================== */
 .container {
   max-width: 900px;
   margin: 3rem auto;
@@ -39,9 +36,6 @@ h3 {
   font-weight: 500;
 }
 
-/* ==========================
-   Form Styling
-   ========================== */
 form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -61,8 +55,6 @@ select {
   font-size: 0.95rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  background-color: #fff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus,
@@ -72,36 +64,27 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-hr,
 h3,
 button {
   grid-column: 1 / -1;
 }
 
-/* ==========================
-   Button
-   ========================== */
 button {
   margin-top: 1.5rem;
   padding: 0.9rem 1.2rem;
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
+  color: white;
   font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
 }
 
-/* ==========================
-   QR Section
-   ========================== */
 .qr-container {
   margin-top: 3rem;
   text-align: center;
@@ -109,84 +92,51 @@ button:hover {
 
 .qr-container img {
   padding: 0.75rem;
-  background: #ffffff;
+  background: #fff;
   border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.qr-container a {
-  display: inline-block;
-  margin-top: 1rem;
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.qr-container a:hover {
-  text-decoration: underline;
-}
-
-/* ==========================
-   Responsive
-   ========================== */
-@media (max-width: 768px) {
-  .container {
-    padding: 1.5rem;
-    margin: 1.5rem;
-  }
-
-  form {
-    grid-template-columns: 1fr;
-  }
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 </style>
 
 <div class="container">
-  <h1>Edit Employee – {{ employee_id }}</h1>
+  <h1>Edit Employee – {{ employee.id }}</h1>
 
   {% if message %}
-  <div class="msg">{{ message }}</div>
+    <div class="msg">{{ message }}</div>
   {% endif %}
 
   <form method="POST">
+
     <label>Name</label>
-    <input type="text" name="name" value="{{ employee['Name'] }}" required>
+    <input type="text" name="name" value="{{ employee.name }}" required>
 
     <label>Date of Birth</label>
-    <!-- ✅ FIXED -->
-    <input type="date"
-           name="dob"
-           value="{{ employee['Date of Birth'] }}"
-           required>
+    <!-- ✅ FIXED: NO strftime -->
+    <input type="date" name="dob" value="{{ employee.dob }}" required>
 
     <label>Gender</label>
     <select name="gender" required>
-      <option value="Male" {% if employee['Gender'] == 'Male' %}selected{% endif %}>Male</option>
-      <option value="Female" {% if employee['Gender'] == 'Female' %}selected{% endif %}>Female</option>
-      <option value="Other" {% if employee['Gender'] == 'Other' %}selected{% endif %}>Other</option>
+      <option value="Male" {% if employee.gender == 'Male' %}selected{% endif %}>Male</option>
+      <option value="Female" {% if employee.gender == 'Female' %}selected{% endif %}>Female</option>
+      <option value="Other" {% if employee.gender == 'Other' %}selected{% endif %}>Other</option>
     </select>
 
     <h3>Emergency Details</h3>
 
     <label>Blood Group</label>
-    <input type="text" name="blood_group"
-           value="{{ employee['Emergency Details']['Blood group'] }}" required>
+    <input type="text" name="blood_group" value="{{ employee.blood_group }}" required>
 
     <label>Contact Person Name</label>
-    <input type="text" name="contact_person_name"
-           value="{{ employee['Emergency Details']['Contact Person Name'] }}" required>
+    <input type="text" name="contact_person_name" value="{{ employee.contact_person_name }}" required>
 
     <label>Relation</label>
-    <input type="text" name="relation"
-           value="{{ employee['Emergency Details']['Relation'] }}" required>
+    <input type="text" name="relation" value="{{ employee.relation }}" required>
 
     <label>Phone Number</label>
-    <input type="text" name="phone_number"
-           value="{{ employee['Emergency Details']['Phone Number'] }}" required>
+    <input type="text" name="phone_number" value="{{ employee.phone_number }}" required>
 
     <label>Company Phone Number</label>
-    <input type="text" name="company_phone_number"
-           value="{{ employee['Emergency Details']['Company Phone Number'] }}" required>
+    <input type="text" name="company_phone_number" value="{{ employee.company_phone_number }}" required>
 
     <button type="submit">Save Changes</button>
   </form>
@@ -194,15 +144,10 @@ button:hover {
   <div class="qr-container">
     <h3>Current QR Code</h3>
 
-    {% if qr_base64 %}
-      <img src="{{ qr_base64 }}" width="200" alt="QR Code">
+    {% if employee.qr_base64 %}
+      <img src="{{ employee.qr_base64 }}" width="200" alt="QR Code">
     {% else %}
-      <p>No QR available.</p>
-    {% endif %}
-
-    {% if qr_url %}
-      <br>
-      <a href="{{ qr_url }}" target="_blank">Download QR </a>
+      <p style="color:#6b7280;">No QR available</p>
     {% endif %}
   </div>
 </div>

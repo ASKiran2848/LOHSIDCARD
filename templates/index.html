@@ -3,9 +3,6 @@
 
 {% block content %}
 <style>
-/* ==========================
-   Page Layout
-   ========================== */
 .page-container {
   max-width: 1100px;
   margin: 3rem auto;
@@ -25,9 +22,6 @@
   color: #0f172a;
 }
 
-/* ==========================
-   Buttons
-   ========================== */
 .btn {
   display: inline-block;
   margin-right: 0.6rem;
@@ -50,13 +44,6 @@
   background: linear-gradient(135deg, #dc2626, #b91c1c);
 }
 
-.btn:hover {
-  opacity: 0.92;
-}
-
-/* ==========================
-   Table
-   ========================== */
 .table-container {
   background: #ffffff;
   border-radius: 16px;
@@ -90,13 +77,6 @@ tr {
   border-bottom: 1px solid #e5e7eb;
 }
 
-tr:last-child {
-  border-bottom: none;
-}
-
-/* ==========================
-   QR Image
-   ========================== */
 .qr {
   width: 80px;
   padding: 0.4rem;
@@ -105,26 +85,10 @@ tr:last-child {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* ==========================
-   Actions
-   ========================== */
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-}
-
-/* ==========================
-   Responsive
-   ========================== */
-@media (max-width: 768px) {
-  .page-header {
-    gap: 1rem;
-  }
-
-  .btn {
-    margin-bottom: 0.5rem;
-  }
 }
 </style>
 
@@ -149,21 +113,34 @@ tr:last-child {
       </thead>
 
       <tbody>
-        {% for id, emp in employees.items() %}
+        {% for emp in employees %}
         <tr>
-          <td>{{ id }}</td>
-          <td>{{ emp.details['Name'] }}</td>
+          <td>{{ emp.id }}</td>
+          <td>{{ emp.name }}</td>
           <td>
-            <img class="qr" src="{{ emp.qr_base64 }}" alt="QR Code">
+            {% if emp.qr_base64 %}
+              <img class="qr" src="{{ emp.qr_base64 }}" alt="QR Code">
+            {% else %}
+              —
+            {% endif %}
           </td>
           <td>
             <div class="actions">
-              <a class="btn secondary" href="/employee/{{ id }}">View</a>
-              <a class="btn" href="{{ emp.qr_url }}" target="_blank">Download QR</a>
+              <a class="btn secondary"
+                 href="{{ url_for('emergency_details_page', employee_id=emp.id) }}">
+                View
+              </a>
 
-              <form action="/delete/{{ id }}" method="POST" style="display:inline;">
+              {% if emp.qr_url %}
+                <a class="btn" href="{{ emp.qr_url }}" target="_blank">
+                  Download QR
+                </a>
+              {% endif %}
+
+              <form action="{{ url_for('delete_employee', employee_id=emp.id) }}"
+                    method="POST" style="display:inline;">
                 <button class="btn danger" type="submit"
-                        onclick="return confirm('Delete employee {{ id }}?')">
+                        onclick="return confirm('Delete employee {{ emp.id }}?')">
                   Delete
                 </button>
               </form>

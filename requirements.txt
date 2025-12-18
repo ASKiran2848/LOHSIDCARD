@@ -1,4 +1,6 @@
 flask
+Flask-SQLAlchemy
+Werkzeug
 gunicorn
 qrcode
 pillow

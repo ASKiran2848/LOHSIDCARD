@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Manage Admins{% endblock %}
+{% block content %}
+<style>
+/* ==========================
+   Admin Management – Minimal & Professional
+   ========================== */
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #111827;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+/* Messages */
+.msg {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.msg.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.msg.success {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+/* Form */
+form {
+  margin-bottom: 2rem;
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color: #374151;
+}
+
+input {
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  margin-bottom: 0.8rem;
+}
+
+button {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button.delete {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+button.delete:hover {
+  opacity: 0.9;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.9rem;
+}
+
+th {
+  font-weight: 600;
+  color: #374151;
+}
+
+.actions {
+  display: flex;
+  gap: 0.4rem;
+}
+</style>
+
+<div class="container">
+
+  <h2>Admin Management</h2>
+
+  {% if error %}
+  <div class="msg error">{{ error }}</div>
+  {% endif %}
+
+  {% if success %}
+  <div class="msg success">{{ success }}</div>
+  {% endif %}
+
+  <h3>Add New Admin</h3>
+  <form method="POST">
+    <label>Username</label>
+    <input type="text" name="username" required>
+
+    <label>Password</label>
+    <input type="password" name="password" required>
+
+    <button type="submit">Create Admin</button>
+  </form>
+
+  <h3>Existing Admins</h3>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Action</th>
+    </tr>
+
+    {% for admin in admins %}
+    <tr>
+      <td>{{ admin.id }}</td>
+      <td>{{ admin.username }}</td>
+      <td>
+        {% if admin.id != session["admin_id"] %}
+        <form
+          method="POST"
+          action="{{ url_for('delete_admin', admin_id=admin.id) }}"
+          onsubmit="return confirm('Delete this admin?');"
+          class="actions"
+        >
+          <button type="submit" class="delete">Delete</button>
+        </form>
+        {% else %}
+          <em>Logged in</em>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+</div>
+{% endblock %}

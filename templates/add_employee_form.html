@@ -3,22 +3,6 @@
 
 {% block content %}
 <style>
-/* ==========================
-   Global Reset & Base Styles
-   ========================== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
-  background: linear-gradient(135deg, #eef2f7, #f9fbfd);
-  color: #1f2937;
-  line-height: 1.6;
-}
-
 .container {
   max-width: 900px;
   margin: 3rem auto;
@@ -71,12 +55,6 @@ select {
   font-size: 0.95rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  background-color: #fff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-input::placeholder {
-  color: #9ca3af;
 }
 
 input:focus,
@@ -97,51 +75,21 @@ button {
   margin-top: 1.5rem;
   padding: 0.9rem 1.2rem;
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
+  color: white;
   font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
 }
 
-.qr-container {
-  margin-top: 2.5rem;
-  text-align: center;
-}
-
-.qr-container img {
-  padding: 0.75rem;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.json-box {
-  margin-top: 1.5rem;
-  background: #0f172a;
-  color: #e5e7eb;
-  padding: 1.2rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  overflow-x: auto;
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 1.5rem;
-    margin: 1.5rem;
-  }
-
-  form {
-    grid-template-columns: 1fr;
-  }
+.readonly {
+  background: #f3f4f6;
+  cursor: not-allowed;
 }
 </style>
 
@@ -149,59 +97,57 @@ button:hover {
   <h1>Add New Employee</h1>
 
   {% if message %}
-  <div class="msg">{{ message }}</div>
+    <div class="msg">{{ message }}</div>
   {% endif %}
 
   <form method="POST">
 
-    <label for="employee_id">Employee ID</label>
-    <input type="text" id="employee_id" name="employee_id" required>
+    <label>Employee ID</label>
+    <input type="text" name="employee_id" required>
 
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" required>
+    <label>Name</label>
+    <input type="text" name="name" required>
 
-    <label for="dob">Date of Birth</label>
-    <input type="date" id="dob" name="dob" required>
+    <label>Date of Birth</label>
+    <input type="date" name="dob" required>
 
-    <label for="gender">Gender</label>
-    <select id="gender" name="gender" required>
+    <label>Gender</label>
+    <select name="gender" required>
       <option value="">-- Select --</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-      <option value="Other">Other</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
     </select>
 
     <h3>Emergency Details</h3>
 
-    <label for="blood_group">Blood Group</label>
-    <input type="text" id="blood_group" name="blood_group" placeholder="O+" required>
+    <label>Blood Group</label>
+    <input type="text" name="blood_group" placeholder="O+" required>
 
-    <label for="contact_person_name">Contact Person Name</label>
-    <input type="text" id="contact_person_name" name="contact_person_name" required>
+    <label>Contact Person Name</label>
+    <input type="text" name="contact_person_name" required>
 
-    <label for="relation">Relation</label>
-    <input type="text" id="relation" name="relation" required>
+    <label>Relation</label>
+    <input type="text" name="relation" required>
 
-    <label for="phone_number">Contact Person Phone</label>
-    <input type="tel" id="phone_number" name="phone_number" placeholder="+91 98765 43210" required>
+    <label>Emergency Contact Phone</label>
+    <input type="tel" name="phone_number" required>
 
-    <label for="company_phone_number">Company Phone Number</label>
-    <input type="tel" id="company_phone_number" name="company_phone_number" placeholder="+1 (555) 123-4567" required>
+    <!-- 🔒 LOCKED COMPANY PHONE -->
+    <label>Company Phone Number</label>
+    <input type="tel"
+           name="company_phone_number"
+           value="8886053331"
+           readonly
+           class="readonly">
 
     <button type="submit">Add Employee</button>
   </form>
 
   {% if new_employee_id %}
-  <hr>
-  <div class="qr-container">
-    <h3>Generated QR Code</h3>
-    <img src="{{ employees[new_employee_id].qr_base64 }}" width="200" alt="QR Code">
-  </div>
-
-  <h3>Employee JSON</h3>
-  <div class="json-box">
-    <pre>{{ json_output }}</pre>
-  </div>
+    <div style="margin-top:2rem;text-align:center;">
+      <p><strong>Employee added successfully!</strong></p>
+    </div>
   {% endif %}
 </div>
 {% endblock %}

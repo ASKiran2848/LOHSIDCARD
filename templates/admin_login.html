@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<style>
+  .logo-wrapper {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .company-logo {
+    max-width: 140px;
+    height: auto;
+  }
+  .login-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  .login-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: #444;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: #4f46e5;
+  }
+  .login-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 10px;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .login-btn:hover {
+    background: #4338ca;
+  }
+  .msg.error {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 0.6rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+</style>
+
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="logo-wrapper">
+      <img src="{{ url_for('static', filename='images/company_logo.jpg') }}" alt="Company Logo" class="company-logo">
+    </div>
+    <h2>🔐 Admin Login</h2>
+
+    {% if error %}
+    <div class="msg error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required>
+      </div>
+
+      <button class="login-btn" type="submit">Login</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
