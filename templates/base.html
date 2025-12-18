@@ -161,7 +161,8 @@
         {% if session.get("admin_id") %}
             <a href="{{ url_for('index') }}">👥 Employees</a>
             <a href="{{ url_for('add_employee_page') }}">➕ Add</a>
-            <a href="{{ url_for('edit_employee_search') }}">✏️ Edit</a>
+            <!-- FIXED: removed broken edit_employee_search -->
+            <a href="{{ url_for('index') }}">✏️ Edit</a>
             <a href="{{ url_for('manage_admins') }}">👤 Admins</a>
             <a href="{{ url_for('change_password') }}">🔐 Password</a>
             <a href="{{ url_for('admin_logout') }}" class="logout">🚪 Logout</a>
