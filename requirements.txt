@@ -5,5 +5,6 @@ gunicorn
 qrcode
 pillow
 cloudinary
-pip install psycopg2-binary
+python-dotenv
+psycopg2-binary
 qrcode[pil] # qrcode with Pillow for image generation

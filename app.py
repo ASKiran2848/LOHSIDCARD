@@ -13,29 +13,34 @@ import qrcode
 import cloudinary
 import cloudinary.uploader
 
+from dotenv import load_dotenv
+
+# =========================================================
+# LOAD ENV
+# =========================================================
+load_dotenv()
+
 # =========================================================
 # APP CONFIG
 # =========================================================
 app = Flask(__name__)
 
-# 🔐 Secrets (use ENV in production)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 
 # =========================================================
-# DATABASE CONFIG (PostgreSQL)
+# DATABASE CONFIG (PostgreSQL / Render)
 # =========================================================
 DATABASE_URL = os.getenv("DATABASE_URL")
-
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
 
-# Fix Render postgres:// issue
+# Fix deprecated postgres:// prefix
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 
 db = SQLAlchemy(app)
 
@@ -75,15 +80,15 @@ class Employee(db.Model):
     qr_base64 = db.Column(db.Text)
 
 # =========================================================
-# LOGIN REQUIRED DECORATOR
+# AUTH DECORATOR
 # =========================================================
-def login_required(func):
-    @wraps(func)
+def login_required(fn):
+    @wraps(fn)
     def wrapper(*args, **kwargs):
         if "admin_id" not in session:
             return redirect(url_for("admin_login"))
         session.permanent = True
-        return func(*args, **kwargs)
+        return fn(*args, **kwargs)
     return wrapper
 
 # =========================================================
@@ -103,7 +108,6 @@ def generate_qr_code(employee_id):
 
     qr_img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
 
-    # Optional logo
     logo_path = "static/images/company_logo.jpg"
     if os.path.exists(logo_path):
         logo = Image.open(logo_path)
@@ -198,7 +202,7 @@ def change_password():
         else:
             admin.password_hash = generate_password_hash(request.form["new_password"])
             db.session.commit()
-            success = "Password updated"
+            success = "Password updated successfully"
 
     return render_template("change_password.html", error=error, success=success)
 
@@ -242,8 +246,7 @@ def delete_admin(admin_id):
 @app.route("/")
 @login_required
 def index():
-    employees = Employee.query.all()
-    return render_template("index.html", employees=employees)
+    return render_template("index.html", employees=Employee.query.all())
 
 
 @app.route("/add", methods=["GET", "POST"])
@@ -271,7 +274,7 @@ def add_employee_page():
             )
             db.session.add(emp)
             db.session.commit()
-            message = "Employee added"
+            message = "Employee added successfully"
 
     return render_template("add_employee_form.html", message=message)
 
@@ -284,14 +287,12 @@ def edit_employee(employee_id):
         return redirect(url_for("index"))
 
     if request.method == "POST":
-        emp.name = request.form["name"]
-        emp.dob = request.form["dob"]
-        emp.gender = request.form["gender"]
-        emp.blood_group = request.form["blood_group"]
-        emp.contact_person_name = request.form["contact_person_name"]
-        emp.relation = request.form["relation"]
-        emp.phone_number = request.form["phone_number"]
-        emp.company_phone_number = request.form["company_phone_number"]
+        for field in [
+            "name", "dob", "gender", "blood_group",
+            "contact_person_name", "relation",
+            "phone_number", "company_phone_number"
+        ]:
+            setattr(emp, field, request.form[field])
         db.session.commit()
 
     return render_template("edit_employee.html", employee=emp)
@@ -307,7 +308,7 @@ def delete_employee(employee_id):
     return redirect(url_for("index"))
 
 # =========================================================
-# PUBLIC PAGE
+# PUBLIC EMERGENCY PAGE
 # =========================================================
 @app.route("/employee/<employee_id>")
 def emergency_details_page(employee_id):
@@ -324,11 +325,12 @@ if __name__ == "__main__":
         db.create_all()
 
         if not Admin.query.filter_by(username="admin").first():
-            admin = Admin(
-                username="admin",
-                password_hash=generate_password_hash("admin123"),
+            db.session.add(
+                Admin(
+                    username="admin",
+                    password_hash=generate_password_hash("admin123"),
+                )
             )
-            db.session.add(admin)
             db.session.commit()
 
     app.run(debug=True)
