@@ -64,6 +64,13 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
+/* Read-only field styling */
+input[readonly] {
+  background: #f1f5f9;
+  cursor: not-allowed;
+  color: #475569;
+}
+
 h3,
 button {
   grid-column: 1 / -1;
@@ -111,7 +118,6 @@ button:hover {
     <input type="text" name="name" value="{{ employee.name }}" required>
 
     <label>Date of Birth</label>
-    <!-- ✅ FIXED: NO strftime -->
     <input type="date" name="dob" value="{{ employee.dob }}" required>
 
     <label>Gender</label>
@@ -135,8 +141,12 @@ button:hover {
     <label>Phone Number</label>
     <input type="text" name="phone_number" value="{{ employee.phone_number }}" required>
 
+    <!-- ✅ READ-ONLY FIELD -->
     <label>Company Phone Number</label>
-    <input type="text" name="company_phone_number" value="{{ employee.company_phone_number }}" required>
+    <input type="text"
+           name="company_phone_number"
+           value="{{ employee.company_phone_number }}"
+           readonly>
 
     <button type="submit">Save Changes</button>
   </form>
