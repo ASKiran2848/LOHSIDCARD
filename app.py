@@ -44,15 +44,13 @@ class Admin(db.Model):
 class Employee(db.Model):
     id = db.Column(db.String(50), primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    dob = db.Column(db.String(10), nullable=False)  # YYYY-MM-DD
+    dob = db.Column(db.String(10), nullable=False)
     gender = db.Column(db.String(10), nullable=False)
-
     blood_group = db.Column(db.String(10), nullable=False)
     contact_person_name = db.Column(db.String(100), nullable=False)
     relation = db.Column(db.String(50), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     company_phone_number = db.Column(db.String(20), nullable=False)
-
     qr_url = db.Column(db.Text)
     qr_base64 = db.Column(db.Text)
 
@@ -139,6 +137,31 @@ def admin_logout():
     return redirect(url_for("admin_login"))
 
 # =========================================================
+# FORGOT PASSWORD
+# =========================================================
+@app.route("/admin/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    error = success = None
+
+    if request.method == "POST":
+        username = request.form["username"]
+        new_password = request.form["new_password"]
+        confirm_password = request.form["confirm_password"]
+
+        admin = Admin.query.filter_by(username=username).first()
+
+        if not admin:
+            error = "Admin username not found"
+        elif new_password != confirm_password:
+            error = "Passwords do not match"
+        else:
+            admin.password_hash = generate_password_hash(new_password)
+            db.session.commit()
+            success = "Password reset successful"
+
+    return render_template("forgot_password.html", error=error, success=success)
+
+# =========================================================
 # CHANGE PASSWORD
 # =========================================================
 @app.route("/admin/change-password", methods=["GET", "POST"])
@@ -160,7 +183,7 @@ def change_password():
     return render_template("change_password.html", error=error, success=success)
 
 # =========================================================
-# ADMIN MANAGEMENT (MULTIPLE ADMINS)
+# ADMIN MANAGEMENT
 # =========================================================
 @app.route("/admin/manage", methods=["GET", "POST"])
 @login_required
@@ -180,12 +203,7 @@ def manage_admins():
             success = "Admin created successfully"
 
     admins = Admin.query.all()
-    return render_template(
-        "manage_admins.html",
-        admins=admins,
-        error=error,
-        success=success
-    )
+    return render_template("manage_admins.html", admins=admins, error=error, success=success)
 
 
 @app.route("/admin/delete/<int:admin_id>", methods=["POST"])
@@ -266,7 +284,7 @@ def delete_employee(employee_id):
     return redirect(url_for("index"))
 
 # =========================================================
-# PUBLIC EMERGENCY PAGE (NO LOGIN)
+# PUBLIC EMERGENCY PAGE
 # =========================================================
 @app.route("/employee/<employee_id>")
 def emergency_details_page(employee_id):
@@ -294,7 +312,6 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-        # Default admin
         if not Admin.query.filter_by(username="admin").first():
             admin = Admin(
                 username="admin",

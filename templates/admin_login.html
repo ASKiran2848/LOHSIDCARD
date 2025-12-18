@@ -63,6 +63,17 @@
   .login-btn:hover {
     background: #4338ca;
   }
+  .forgot-link {
+    display: block;
+    margin-top: 0.8rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #4f46e5;
+    text-decoration: none;
+  }
+  .forgot-link:hover {
+    text-decoration: underline;
+  }
   .msg.error {
     background: #fee2e2;
     color: #991b1b;
@@ -78,6 +89,7 @@
     <div class="logo-wrapper">
       <img src="{{ url_for('static', filename='images/company_logo.jpg') }}" alt="Company Logo" class="company-logo">
     </div>
+
     <h2>🔐 Admin Login</h2>
 
     {% if error %}
@@ -97,6 +109,12 @@
 
       <button class="login-btn" type="submit">Login</button>
     </form>
+
+    <!-- Forgot Password -->
+    <a href="{{ url_for('forgot_password') }}" class="forgot-link">
+      Forgot password?
+    </a>
+
   </div>
 </div>
 {% endblock %}
